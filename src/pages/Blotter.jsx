@@ -230,6 +230,18 @@ export default function Blotter() {
     }
   };
 
+  const formatMobile = (num) => {
+    if (!num) return "-";
+
+    const cleaned = num.replace(/\D/g, ""); // remove non-numbers
+
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+    }
+
+    return num; // fallback if not 11 digits
+  };
+
   // =========================
   // PAGINATION
   // =========================
@@ -328,6 +340,7 @@ export default function Blotter() {
                   <th>#</th>
                   <th>Blotter No</th>
                   <th>Complainant</th>
+                  <th>Mobile Number</th>
                   <th>Respondent</th>
                   <th>Incident Type</th>
                   <th>Location</th>
@@ -354,6 +367,7 @@ export default function Blotter() {
                       <td className="fw-semibold">{b.blotter_number}</td>
 
                       <td>{b.complainant_name}</td>
+                      <td>{formatMobile(b.complainant_contact)}</td>
                       <td>{b.respondent_name || "-"}</td>
 
                       <td>{b.incident_type}</td>

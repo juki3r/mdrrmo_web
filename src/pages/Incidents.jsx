@@ -125,6 +125,18 @@ export default function Incidents() {
     return matchSearch && matchStatus;
   });
 
+  const formatMobile = (num) => {
+      if (!num) return "-";
+
+      const cleaned = num.replace(/\D/g, ""); // remove non-numbers
+
+      if (cleaned.length === 11) {
+        return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+      }
+
+      return num; // fallback if not 11 digits
+    };
+
   // ================= FORM =================
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -352,6 +364,7 @@ export default function Incidents() {
                     <th>Date</th>
                     <th>Status</th>
                     <th>Reported By</th>
+                    <th>Mobile Number</th>
                     <th className="text-end">Actions</th>
                   </tr>
                 </thead>
@@ -383,6 +396,7 @@ export default function Incidents() {
                         </td>
                         <td>{getStatusBadge(i.status)}</td>
                         <td>{toProperCase(i.reported_by)}</td>
+                        <td>{toProperCase(formatMobile(i.contact_number))}</td>
 
                         <td className="text-end">
 
