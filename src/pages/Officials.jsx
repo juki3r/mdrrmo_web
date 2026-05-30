@@ -12,8 +12,10 @@ export default function Officials() {
 
   const [showModal, setShowModal] = useState(false);
   const [mode, setMode] = useState("create");
+  const [selectedOfficial, setSelectedOfficial] = useState(null);
 
   const token = localStorage.getItem("token");
+  
 
   const [errors, setErrors] = useState({});
 
@@ -274,6 +276,18 @@ export default function Officials() {
     return rangeWithDots;
   };
 
+  const formatMobile = (num) => {
+    if (!num) return "-";
+
+    const cleaned = num.replace(/\D/g, ""); // remove non-numbers
+
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+    }
+
+    return num; // fallback if not 11 digits
+  };
+
   return (
     <div className="container-fluid p-4">
 
@@ -390,7 +404,16 @@ export default function Officials() {
 
                     {officials.length > 0 ? (
                       officials.map((o, i) => (
-                        <tr key={o.id}>
+                        <tr
+                          key={o.id}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            setSelectedOfficial(o);
+                            setForm(o);
+                            setMode("view");
+                            setShowModal(true);
+                          }}
+                        >
 
                           <td>{(page - 1) * 10 + i + 1}</td>
 
@@ -407,7 +430,7 @@ export default function Officials() {
                           </td>
 
                           <td>{o.position}</td>
-                          <td>{o.contact_number || "-"}</td>
+                          <td>{formatMobile(o.contact_number) || "-"}</td>
 
                           <td>
                             <span className="badge bg-success">
@@ -418,8 +441,10 @@ export default function Officials() {
                           <td className="text-end">
 
                             <button
-                              className="btn btn-primary btn-sm me-1"
-                              onClick={() => {
+                              className="btn btn-sm btn-outline-warning me-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedOfficial(o);
                                 setForm(o);
                                 setMode("view");
                                 setShowModal(true);
@@ -429,11 +454,14 @@ export default function Officials() {
                             </button>
 
                             <button
-                              className="btn btn-danger btn-sm"
-                              onClick={() => handleDelete(o.id)}
-                            >
-                              Delete
-                            </button>
+                                className="btn btn-sm btn-outline-danger me-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(o.id);
+                                }}
+                              >
+                                Delete
+                              </button>
 
                           </td>
 
@@ -498,305 +526,305 @@ export default function Officials() {
       </div>
 
      {/* MODAL */}
-{showModal && (
-  <div
-    className="modal d-block"
-    style={{ background: "rgba(0,0,0,0.6)" }}
-  >
-    <div className="modal-dialog modal-lg modal-dialog-centered">
-      <div className="modal-content rounded-4 border-0 shadow-lg">
+      {showModal && (
+        <div
+          className="modal d-block"
+          style={{ background: "rgba(0,0,0,0.6)" }}
+        >
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content rounded-4 border-0 shadow-lg">
 
-        {/* HEADER */}
-        <div className="modal-header border-0">
-          <div>
-            <h5 className="fw-bold mb-0">
-              {mode === "create"
-                ? "➕ Add Official"
-                : mode === "view"
-                ? "👤 Official Details"
-                : "✏️ Edit Official"}
-            </h5>
-            <small className="text-muted">
-              Barangay Officials Management
-            </small>
-          </div>
+              {/* HEADER */}
+              <div className="modal-header border-0">
+                <div>
+                  <h5 className="fw-bold mb-0">
+                    {mode === "create"
+                      ? "➕ Add Official"
+                      : mode === "view"
+                      ? "👤 Official Details"
+                      : "✏️ Edit Official"}
+                  </h5>
+                  <small className="text-muted">
+                    Barangay Officials Management
+                  </small>
+                </div>
 
-          <button
-            className="btn-close"
-            onClick={() => setShowModal(false)}
-          />
-        </div>
-
-        <div className="modal-body">
-
-          {/* PHOTO */}
-          <div className="mb-3">
-            <label className="form-label fw-semibold">
-              Profile Photo
-            </label>
-
-            <input
-              type="file"
-              className="form-control"
-              disabled={mode === "view"}
-              onChange={handleFile}
-            />
-          </div>
-
-          {/* ================= BASIC INFO ================= */}
-          <div className="mb-3">
-            <h6 className="text-primary fw-bold">📌 Basic Information</h6>
-
-            <div className="row g-3 mt-1">
-
-              {/* FULL NAME */}
-              <div className="col-md-6">
-                <label className="form-label">
-                  Full Name <span className="text-danger">*</span>
-                </label>
-
-                <input
-                  className={`form-control ${errors.full_name ? "border-danger" : ""}`}
-                  name="full_name"
-                  value={form.full_name}
-                  onChange={handleChange}
-                  placeholder="Juan Dela Cruz"
-                  disabled={mode === "view"}
+                <button
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
                 />
               </div>
 
-              {/* POSITION */}
-              <div className="col-md-6">
-                <label className="form-label">
-                  Position <span className="text-danger">*</span>
-                </label>
+              <div className="modal-body">
 
-                <select
-                    className={`form-select ${errors.position ? "border-danger" : ""}`}
-                    name="position"
-                    value={form.position}
-                    onChange={handleChange}
+                {/* PHOTO */}
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    Profile Photo
+                  </label>
+
+                  <input
+                    type="file"
+                    className="form-control"
                     disabled={mode === "view"}
-                    >
-                    <option value="">Select Position</option>
-                    <option value="Barangay Captain">Barangay Captain</option>
-                    <option value="Kagawad">Barangay Kagawad</option>
-                    <option value="Secretary">Barangay Secretary</option>
-                    <option value="Treasurer">Barangay Treasurer</option>
-                    <option value="SK Chairperson">SK Chairperson</option>
-                    <option value="SK Kagawad">SK Kagawad</option>
-                </select>
-              </div>
+                    onChange={handleFile}
+                  />
+                </div>
 
-              {/* GENDER */}
-              <div className="col-md-6">
-                <label className="form-label">Gender</label>
+                {/* ================= BASIC INFO ================= */}
+                <div className="mb-3">
+                  <h6 className="text-primary fw-bold">📌 Basic Information</h6>
 
-                <select
-                  className="form-select"
-                  name="gender"
-                  value={form.gender}
-                  onChange={handleChange}
-                  disabled={mode === "view"}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
+                  <div className="row g-3 mt-1">
 
-              {/* COMMITTEE */}
-              <div className="col-md-6">
-                <label className="form-label">Committee</label>
+                    {/* FULL NAME */}
+                    <div className="col-md-6">
+                      <label className="form-label">
+                        Full Name <span className="text-danger">*</span>
+                      </label>
 
-                <select
+                      <input
+                        className={`form-control ${errors.full_name ? "border-danger" : ""}`}
+                        name="full_name"
+                        value={form.full_name}
+                        onChange={handleChange}
+                        placeholder="Juan Dela Cruz"
+                        disabled={mode === "view"}
+                      />
+                    </div>
+
+                    {/* POSITION */}
+                    <div className="col-md-6">
+                      <label className="form-label">
+                        Position <span className="text-danger">*</span>
+                      </label>
+
+                      <select
+                          className={`form-select ${errors.position ? "border-danger" : ""}`}
+                          name="position"
+                          value={form.position}
+                          onChange={handleChange}
+                          disabled={mode === "view"}
+                          >
+                          <option value="">Select Position</option>
+                          <option value="Barangay Captain">Barangay Captain</option>
+                          <option value="Kagawad">Barangay Kagawad</option>
+                          <option value="Secretary">Barangay Secretary</option>
+                          <option value="Treasurer">Barangay Treasurer</option>
+                          <option value="SK Chairperson">SK Chairperson</option>
+                          <option value="SK Kagawad">SK Kagawad</option>
+                      </select>
+                    </div>
+
+                    {/* GENDER */}
+                    <div className="col-md-6">
+                      <label className="form-label">Gender</label>
+
+                      <select
+                        className="form-select"
+                        name="gender"
+                        value={form.gender}
+                        onChange={handleChange}
+                        disabled={mode === "view"}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+
+                    {/* COMMITTEE */}
+                    <div className="col-md-6">
+                      <label className="form-label">Committee</label>
+
+                      <select
+                          className="form-select"
+                          name="committee"
+                          value={form.committee}
+                          onChange={handleChange}
+                          disabled={mode === "view"}
+                          >
+                          <option value="">Select Committee</option>
+                          <option value="Peace and Order">Peace and Order</option>
+                          <option value="Health">Health</option>
+                          <option value="Education">Education</option>
+                          <option value="Infrastructure">Infrastructure</option>
+                          <option value="Environmental Protection">Environmental Protection</option>
+                          <option value="Finance & Budget">Finance & Budget</option>
+                          <option value="Social Services">Social Services</option>
+                          <option value="Youth & Sports">Youth & Sports</option>
+                      </select>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* ================= CONTACT INFO ================= */}
+                <div className="mb-3">
+                  <h6 className="text-primary fw-bold">📞 Contact Information</h6>
+
+                  <div className="row g-3 mt-1">
+
+                    {/* CONTACT NUMBER */}
+                    <div className="col-md-6">
+                      <label className="form-label">Contact Number</label>
+
+                      <input
+                        className="form-control"
+                        name="contact_number"
+                        value={form.contact_number}
+                        onChange={handleChange}
+                        placeholder="09xxxxxxxxx"
+                        disabled={mode === "view"}
+                      />
+                    </div>
+
+                    {/* EMAIL */}
+                    <div className="col-md-6">
+                      <label className="form-label">Email</label>
+
+                      <input
+                        type="email"
+                        className="form-control"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        placeholder="example@email.com"
+                        disabled={mode === "view"}
+                      />
+                    </div>
+
+                    {/* ADDRESS */}
+                    <div className="col-12">
+                      <label className="form-label">Address</label>
+
+                      <input
+                        className="form-control"
+                        name="address"
+                        value={form.address}
+                        onChange={handleChange}
+                        placeholder="Purok / Street / Barangay"
+                        disabled={mode === "view"}
+                      />
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* ================= TERM INFO ================= */}
+                <div className="mb-3">
+                  <h6 className="text-primary fw-bold">📅 Term Information</h6>
+
+                  <div className="row g-3 mt-1">
+
+                    <div className="col-md-6">
+                      <label className="form-label">Term Start</label>
+
+                      <input
+                        type="date"
+                        className="form-control"
+                        name="term_start"
+                        value={form.term_start}
+                        onChange={handleChange}
+                        disabled={mode === "view"}
+                      />
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label">Term End</label>
+
+                      <input
+                        type="date"
+                        className="form-control"
+                        name="term_end"
+                        value={form.term_end}
+                        onChange={handleChange}
+                        disabled={mode === "view"}
+                      />
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* STATUS */}
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Status</label>
+
+                  <select
                     className="form-select"
-                    name="committee"
-                    value={form.committee}
+                    name="status"
+                    value={form.status}
                     onChange={handleChange}
                     disabled={mode === "view"}
+                  >
+                    <option value="active">🟢 Active</option>
+                    <option value="inactive">🟡 Inactive</option>
+                    <option value="former">🔴 Former</option>
+                  </select>
+                </div>
+
+                {/* REMARKS */}
+                <div className="mb-2">
+                  <label className="form-label fw-semibold">Remarks</label>
+
+                  <textarea
+                    className="form-control"
+                    rows="3"
+                    name="remarks"
+                    value={form.remarks}
+                    onChange={handleChange}
+                    placeholder="Optional notes..."
+                    disabled={mode === "view"}
+                  />
+                </div>
+
+              </div>
+
+              {/* FOOTER */}
+              <div className="modal-footer border-0 d-flex justify-content-between">
+
+                <small className="text-muted">
+                  <span className="text-danger">*</span> Required fields
+                </small>
+
+                <div className="d-flex gap-2">
+
+                  {mode === "create" && (
+                    <button className="btn btn-primary px-4" onClick={handleSubmit}>
+                      Save Official
+                    </button>
+                  )}
+
+                  {mode === "edit" && (
+                    <button className="btn btn-success px-4" onClick={handleUpdate}>
+                      Update
+                    </button>
+                  )}
+
+                  {mode === "view" && (
+                    <button
+                      className="btn btn-warning px-4"
+                      onClick={() => setMode("edit")}
                     >
-                    <option value="">Select Committee</option>
-                    <option value="Peace and Order">Peace and Order</option>
-                    <option value="Health">Health</option>
-                    <option value="Education">Education</option>
-                    <option value="Infrastructure">Infrastructure</option>
-                    <option value="Environmental Protection">Environmental Protection</option>
-                    <option value="Finance & Budget">Finance & Budget</option>
-                    <option value="Social Services">Social Services</option>
-                    <option value="Youth & Sports">Youth & Sports</option>
-                </select>
+                      Edit
+                    </button>
+                  )}
+
+                  <button
+                    className="btn btn-light border"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
+
+                </div>
+
               </div>
 
             </div>
           </div>
-
-          {/* ================= CONTACT INFO ================= */}
-          <div className="mb-3">
-            <h6 className="text-primary fw-bold">📞 Contact Information</h6>
-
-            <div className="row g-3 mt-1">
-
-              {/* CONTACT NUMBER */}
-              <div className="col-md-6">
-                <label className="form-label">Contact Number</label>
-
-                <input
-                  className="form-control"
-                  name="contact_number"
-                  value={form.contact_number}
-                  onChange={handleChange}
-                  placeholder="09xxxxxxxxx"
-                  disabled={mode === "view"}
-                />
-              </div>
-
-              {/* EMAIL */}
-              <div className="col-md-6">
-                <label className="form-label">Email</label>
-
-                <input
-                  type="email"
-                  className="form-control"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="example@email.com"
-                  disabled={mode === "view"}
-                />
-              </div>
-
-              {/* ADDRESS */}
-              <div className="col-12">
-                <label className="form-label">Address</label>
-
-                <input
-                  className="form-control"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
-                  placeholder="Purok / Street / Barangay"
-                  disabled={mode === "view"}
-                />
-              </div>
-
-            </div>
-          </div>
-
-          {/* ================= TERM INFO ================= */}
-          <div className="mb-3">
-            <h6 className="text-primary fw-bold">📅 Term Information</h6>
-
-            <div className="row g-3 mt-1">
-
-              <div className="col-md-6">
-                <label className="form-label">Term Start</label>
-
-                <input
-                  type="date"
-                  className="form-control"
-                  name="term_start"
-                  value={form.term_start}
-                  onChange={handleChange}
-                  disabled={mode === "view"}
-                />
-              </div>
-
-              <div className="col-md-6">
-                <label className="form-label">Term End</label>
-
-                <input
-                  type="date"
-                  className="form-control"
-                  name="term_end"
-                  value={form.term_end}
-                  onChange={handleChange}
-                  disabled={mode === "view"}
-                />
-              </div>
-
-            </div>
-          </div>
-
-          {/* STATUS */}
-          <div className="mb-3">
-            <label className="form-label fw-semibold">Status</label>
-
-            <select
-              className="form-select"
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              disabled={mode === "view"}
-            >
-              <option value="active">🟢 Active</option>
-              <option value="inactive">🟡 Inactive</option>
-              <option value="former">🔴 Former</option>
-            </select>
-          </div>
-
-          {/* REMARKS */}
-          <div className="mb-2">
-            <label className="form-label fw-semibold">Remarks</label>
-
-            <textarea
-              className="form-control"
-              rows="3"
-              name="remarks"
-              value={form.remarks}
-              onChange={handleChange}
-              placeholder="Optional notes..."
-              disabled={mode === "view"}
-            />
-          </div>
-
         </div>
-
-        {/* FOOTER */}
-        <div className="modal-footer border-0 d-flex justify-content-between">
-
-          <small className="text-muted">
-            <span className="text-danger">*</span> Required fields
-          </small>
-
-          <div className="d-flex gap-2">
-
-            {mode === "create" && (
-              <button className="btn btn-primary px-4" onClick={handleSubmit}>
-                Save Official
-              </button>
-            )}
-
-            {mode === "edit" && (
-              <button className="btn btn-success px-4" onClick={handleUpdate}>
-                Update
-              </button>
-            )}
-
-            {mode === "view" && (
-              <button
-                className="btn btn-warning px-4"
-                onClick={() => setMode("edit")}
-              >
-                Edit
-              </button>
-            )}
-
-            <button
-              className="btn btn-light border"
-              onClick={() => setShowModal(false)}
-            >
-              Close
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
     </div>
   );

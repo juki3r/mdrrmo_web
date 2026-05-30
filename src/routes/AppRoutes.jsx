@@ -19,6 +19,7 @@ import Officials from "@/pages/Officials";
 import EventsCalendar from "@/pages/EventsCalendar";
 import EvacuationCenters from "@/pages/EvacuationCenters";
 import Concern from "@/pages/Concern";
+import AppUsers from "@/pages/AppUsers";
 
 
 export default function AppRoutes() {
@@ -56,6 +57,7 @@ export default function AppRoutes() {
             <Route path="/officials" element={<Officials />} />
             <Route path="/events" element={<EventsCalendar />} />
             <Route path="/evacuation-centers" element={<EvacuationCenters />} />
+            <Route path="/appusers" element={<AppUsers />} />
           </Route>
         </Route>
 

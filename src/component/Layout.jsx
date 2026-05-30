@@ -114,8 +114,9 @@ export default function Layout() {
           />
 
           <div>
-            <div className="font-bold text-sm">
-              {role === "bdrrmo_admin" ? "BICDP" : "MICDP"}
+            <div className="font-semibold text-sm">
+              {/* {role === "bdrrmo_admin" ? "BICDP" : "MICDP"} */}
+              Resilient Community
             </div>
             <div className="text-xs text-gray-400">
               {role === "bdrrmo_admin"

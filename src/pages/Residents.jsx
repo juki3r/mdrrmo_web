@@ -1,4 +1,3 @@
-import { space } from "postcss/lib/list";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -10,58 +9,62 @@ export default function Residents() {
 
   const [selectedResident, setSelectedResident] = useState(null);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [mode, setMode] = useState("create"); // create | view
-  const [isEditing, setIsEditing] = useState(false);
+  const [showActionModal, setShowActionModal] = useState(false);
 
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-
   const [search, setSearch] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [mode, setMode] = useState("create");
+  
+
+  const [filters, setFilters] = useState({
+    gender: "",
+    civil_status: "",
+    is_voter: "",
+  });
 
   const emptyForm = {
     first_name: "",
     middle_name: "",
     last_name: "",
-    gender: "",
-    civil_status: "",
 
-    barangay: "",
     purok_zone: "",
-    street_address: "",
-    city_municipality: "",
-
     household_number: "",
-    household_head: false,
 
-    occupation: "",
-    monthly_income: "",
-    email: "",
     mobile_number: "",
-
-    blood_type: "",
-    disability_status: false,
-
-    sss_number: "",
-    tin_number: "",
-    voters_id_number: "",
-    is_voter: false,
+    gender: "",
+    birth_date: "",
+    civil_status: "",
   };
 
   const [form, setForm] = useState(emptyForm);
 
-  const [editForm, setEditForm] = useState(emptyForm);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   // ================= FETCH =================
-  const fetchResidents = async (
-    pageNum = 1,
-    searchTerm = ""
-  ) => {
+  const fetchResidents = async (pageNum = 1, searchTerm = "", currentFilters = filters) => {
     setLoading(true);
 
     try {
+      const query = new URLSearchParams({
+        page: pageNum,
+        search: searchTerm,
+        gender: currentFilters.gender,
+        civil_status: currentFilters.civil_status,
+        is_voter: currentFilters.is_voter,
+      });
+
       const res = await fetch(
-        `https://ajcpisonet.com/api/residents?page=${pageNum}&search=${searchTerm}`,
+        `https://ajcpisonet.com/api/residents?${query.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -82,118 +85,19 @@ export default function Residents() {
     }
   };
 
-  useEffect(() => {
-    fetchResidents(1, "");
-  }, []);
-
-  // ================= CREATE =================
-  const handleChange = (e) => {
-    const { name, value, type, checked } =
-      e.target;
-
-    setForm({
-      ...form,
-      [name]:
-        type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await fetch(
-        "https://ajcpisonet.com/api/residents",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-          body: JSON.stringify(form),
-        }
-      );
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        toast.error(
-          result.message || "Failed to create"
-        );
-        return;
-      }
-
-      toast.success("Resident added");
-
-      setModalOpen(false);
-
-      setForm(emptyForm);
-
-      fetchResidents();
-    } catch {
-      toast.error("Server error");
-    }
-  };
-
-  // ================= UPDATE =================
-  const handleUpdate = async () => {
-    try {
-      const res = await fetch(
-        `https://ajcpisonet.com/api/residents/${selectedResident.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-          body: JSON.stringify(editForm),
-        }
-      );
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        toast.error(
-          result.message || "Update failed"
-        );
-        return;
-      }
-
-      toast.success("Resident updated");
-
-      setIsEditing(false);
-      setModalOpen(false);
-      setSelectedResident(null);
-
-      fetchResidents();
-    } catch {
-      toast.error("Server error");
-    }
-  };
-
-  const calculateAge = (dob) => {
-    if (!dob) return "-";
-
-    const birthDate = new Date(dob);
-    const today = new Date();
-
-    let age = today.getFullYear() - birthDate.getFullYear();
-
-    const m = today.getMonth() - birthDate.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-
-    return age;
-  };
+ useEffect(() => {
+    fetchResidents(page, search);
+  }, [
+    page,
+    search,
+    filters.gender,
+    filters.civil_status,
+    filters.is_voter
+  ]);
 
   // ================= DELETE =================
   const handleDelete = async (id) => {
-    if (!confirm("Delete this resident?"))
-      return;
+    if (!confirm("Delete this resident?")) return;
 
     try {
       const res = await fetch(
@@ -202,6 +106,7 @@ export default function Residents() {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
+            Accept: "application/json",
           },
         }
       );
@@ -212,12 +117,76 @@ export default function Residents() {
       }
 
       toast.success("Resident deleted");
-
-      fetchResidents();
+      fetchResidents(page, search);
     } catch {
       toast.error("Server error");
     }
   };
+
+  const handleUpdate = async () => {
+  try {
+    const res = await fetch(
+      `https://ajcpisonet.com/api/residents/${editForm.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify(editForm),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || "Update failed");
+      return;
+    }
+
+    toast.success("Resident updated");
+
+    setShowEditModal(false);
+    setEditForm(null);
+
+    fetchResidents(page, search);
+  } catch {
+    toast.error("Server error");
+  }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("https://ajcpisonet.com/api/residents", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || "Failed to create resident");
+      return;
+    }
+
+    toast.success("Resident added successfully");
+
+    setModalOpen(false);
+    setForm(emptyForm);
+
+    fetchResidents(page, search);
+  } catch (err) {
+    toast.error("Server error");
+  }
+};
 
   // ================= PAGINATION =================
   const getPages = () => {
@@ -227,24 +196,16 @@ export default function Residents() {
     let l;
 
     for (let i = 1; i <= lastPage; i++) {
-      if (
-        i === 1 ||
-        i === lastPage ||
-        (i >= page - delta &&
-          i <= page + delta)
-      ) {
+      if (i === 1 || i === lastPage || (i >= page - delta && i <= page + delta)) {
         range.push(i);
       }
     }
 
     range.forEach((i) => {
       if (l) {
-        if (i - l === 2)
-          rangeWithDots.push(l + 1);
-        else if (i - l !== 1)
-          rangeWithDots.push("...");
+        if (i - l === 2) rangeWithDots.push(l + 1);
+        else if (i - l !== 1) rangeWithDots.push("...");
       }
-
       rangeWithDots.push(i);
       l = i;
     });
@@ -252,67 +213,157 @@ export default function Residents() {
     return rangeWithDots;
   };
 
-  // ================= UI =================
+  const formatMobile = (num) => {
+    if (!num) return "-";
+
+    const cleaned = num.replace(/\D/g, ""); // remove non-numbers
+
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+    }
+
+    return num; // fallback if not 11 digits
+  };
+
   return (
-    <div className="container-fluid p-4">
+    <div className="container-fluid py-4">
 
-      {/* HEADER */}
-      <div className="d-flex justify-content-between mb-3 flex-wrap gap-2">
+      {/* ================= HEADER ================= */}
+      <div className="card shadow-sm border-0 mb-3">
+        <div className="card-body">
 
-        <input
-          className="form-control"
-          style={{ width: "350px" }}
-          placeholder="Search resident..."
-          value={search}
-          onChange={(e) => {
-            const value = e.target.value;
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="fw-bold mb-0">Residents</h5>
 
-            setSearch(value);
-            setPage(1);
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setForm(emptyForm);
+                setMode("create");
+                setModalOpen(true);
+              }}
+            >
+              <i className="bi bi-plus-lg me-2"></i>
+              Add Resident
+            </button>
+          </div>
+          <div className="row mb-3">
+            <div className="col">
+              {/* SEARCH */}
+              <div className="input-group">
+                <span className="input-group-text bg-white">
+                  <i className="bi bi-search"></i>
+                </span>
 
-            fetchResidents(1, value);
-          }}
-        />
+                <input
+                  className="form-control"
+                  placeholder="Search residents..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                />
+              </div>
+            </div>
+            {/* GENDER */}
+              <div className="col-md-2">
+                <select
+                  className="form-select form-select-sm"
+                  value={filters.gender}
+                  onChange={(e) => {
+                      const value = e.target.value;
 
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            setForm(emptyForm);
+                      setFilters((prev) => ({
+                        ...prev,
+                        gender: value,
+                      }));
 
-            setModalOpen(true);
-            setMode("create");
-          }}
-        >
-          <i className="bi bi-plus-lg me-1"></i>
-          Add Resident
-        </button>
+                      setPage(1); // reset page when filtering
+                    }}
+                >
+                  <option value="">All Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
 
+              {/* CIVIL STATUS */}
+              <div className="col-md-2">
+                <select
+                  className="form-select form-select-sm"
+                  value={filters.civil_status}
+                  onChange={(e) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      civil_status: e.target.value,
+                    }));
+                    setPage(1);
+                  }}
+                >
+                  <option value="">All Civil Status</option>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
+                  <option value="Widowed">Widowed</option>
+                  <option value="Divorced">Divorced</option>
+                </select>
+              </div>
+
+              {/* VOTER */}
+              <div className="col-md-2">
+                <select
+                  className="form-select form-select-sm"
+                  value={filters.is_voter}
+                  onChange={(e) => {
+                      setFilters((prev) => ({
+                        ...prev,
+                        is_voter: e.target.value,
+                      }));
+                      setPage(1);
+                    }}
+                >
+                  <option value="">All Voters</option>
+                  <option value="1">Voter</option>
+                  <option value="0">Non-Voter</option>
+                </select>
+              </div>
+
+            </div>
+
+          </div>
+
+          
+
+          <div className="row g-2 mt-3">
+
+  
+
+        </div>
       </div>
 
-      {/* TABLE */}
+      {/* ================= TABLE ================= */}
       <div className="card shadow-sm border-0">
         <div className="card-body">
 
           {loading ? (
-            <p>Loading...</p>
+            <div className="text-center py-5">Loading...</div>
           ) : (
             <div className="table-responsive">
 
-              <table className="table table-hover align-middle">
+              <table className="table table-hover align-middle small">
 
                 <thead className="table-light">
                   <tr>
                     <th>#</th>
-                    <th>Resident</th>
-                    <th>Address</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Barangay</th>
+                    <th>Purok</th>
                     <th>Contact</th>
                     <th>Age</th>
-                    <th>Civil status</th>
-                    <th>Housing type</th>
+                    <th>Civil Status</th>
                     <th>Voter</th>
-                    <th className="text-end">
-                      Actions
-                    </th>
+                    <th className="text-end">Actions</th>
                   </tr>
                 </thead>
 
@@ -320,163 +371,82 @@ export default function Residents() {
 
                   {residents.length > 0 ? (
                     residents.map((r, i) => (
-                      <tr key={r.id}>
+                      <tr
+                        key={r.id}
+                        onClick={() => {
+                          setSelectedResident(r);
+                          setShowActionModal(true);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
 
-                        <td>{i + 1}</td>
+                        <td>{(page - 1) * 10 + i + 1}</td>
 
-                        {/* RESIDENT */}
-                        <td>
-                          <div className="d-flex align-items-center gap-3">
-
-                            <div
-                              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
-                              style={{
-                                width: "50px",
-                                height: "50px",
-                              }}
-                            >
-                              {r.first_name?.charAt(
-                                0
-                              )}
-                              {r.last_name?.charAt(0)}
-                            </div>
-
-                            <div>
-
-                              <div className="fw-bold">
-                                {r.first_name}{" "}
-                                {r.last_name}
-                              </div>
-
-                              <small className="text-muted">
-                                {r.gender || "N/A"} •{" "}
-                                {r.civil_status ||
-                                  "N/A"}
-                              </small>
-
-                            </div>
-
-                          </div>
+                        <td className="fw-semibold text-capitalize">
+                          {r.first_name} {r.last_name}
                         </td>
+                        <td>{r.gender}</td>
 
-                        {/* ADDRESS */}
+                        <td className="text-capitalize">{r.barangay || "-"}</td>
+                        <td className="text-capitalize">{r.purok_zone || "-"}</td>
+
+                        <td>{formatMobile(r.mobile_number) || "-"}</td>
+
                         <td>
-                          <div className="fw-semibold">
-                            {r.barangay || "-"}
-                          </div>
-
-                          <small className="text-muted">
-                            {r.purok_zone ||
-                              "No purok"}
-                          </small>
+                          {r.birth_date
+                            ? new Date().getFullYear() -
+                              new Date(r.birth_date).getFullYear()
+                            : "-"}
                         </td>
+                        <td className="text-capitalize">{r.civil_status || "-"}</td>
 
-                        {/* CONTACT */}
-                        <td>
-                          <div className="fw-semibold">
-                            {r.mobile_number
-                              ? r.mobile_number.replace(/(\d{4})(\d{3})(\d{4})/, "$1-$2-$3")
-                              : "-"}
-                          </div>
-
-                          <small className="text-muted">
-                            {r.email || "No email"}
-                          </small>
-                        </td>
-                        <td>
-                            {r.birth_date ? (
-                              <>
-                                <div className="fw-semibold">
-                                  {calculateAge(r.birth_date)} yrs old
-                                </div>
-
-                                <small className="text-muted">
-                                  {r.birth_date
-                                    ? new Date(r.birth_date).toLocaleDateString("en-PH", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "2-digit",
-                                      })
-                                    : "-"}
-                                </small>
-                              </>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                              {r.civil_status}
-                          </td>
-                          <td>
-                              {r.housing_type}
-                          </td>
-
-                        {/* STATUS */}
                         <td>
                           <span className={`badge ${r.is_voter ? "bg-primary" : "bg-secondary"}`}>
                             {r.is_voter ? "Yes" : "No"}
                           </span>
                         </td>
 
-                        {/* ACTIONS */}
-                        <td>
-                            <div  className="text-end d-flex gap-2 justify-content-end">
+                        <td className="text-end">
+
                           <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => {
+                            className="btn btn-sm btn-outline-warning me-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditForm(r);
+                              setShowEditModal(true);
+                            }}
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="btn btn-sm btn-outline-primary me-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedResident(r);
-
-                              setEditForm({
-                                ...r,
-                              });
-
-                              setMode("view");
-                              setIsEditing(false);
-                              setModalOpen(true);
+                              setShowActionModal(true);
                             }}
                           >
                             View
                           </button>
 
                           <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() =>
-                              handleDelete(r.id)
-                            }
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(r.id);
+                            }}
                           >
                             Delete
                           </button>
-                          </div>
-
                         </td>
 
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan="9"
-                        className="text-center py-5"
-                      >
-
-                        <div className="d-flex flex-column align-items-center justify-content-center">
-
-                          <i
-                            className="bi bi-people"
-                            style={{
-                              fontSize: "48px",
-                              color: "#cbd5e1",
-                              marginBottom: "10px",
-                            }}
-                          ></i>
-
-                          <h6 className="fw-semibold mb-1 text-muted">
-                            No residents found
-                          </h6>
-
-                        </div>
-
+                      <td colSpan="7" className="text-center py-5">
+                        No residents found
                       </td>
                     </tr>
                   )}
@@ -488,811 +458,447 @@ export default function Residents() {
             </div>
           )}
 
-          {/* PAGINATION */}
-          <div className="d-flex justify-content-center align-items-center mt-4 gap-2 flex-wrap">
+          {/* ================= PAGINATION ================= */}
+          {lastPage > 1 && (
+            <div className="d-flex justify-content-between align-items-center mt-4">
 
-            {/* PREV */}
-            <button
-              className="btn btn-light border rounded-pill px-3"
-              disabled={page === 1}
-              onClick={() =>
-                fetchResidents(page - 1, search)
-              }
-            >
-              ← Prev
-            </button>
+              <div className="text-muted small">
+                Page {page} of {lastPage}
+              </div>
 
-            {/* NUMBERS */}
-            {getPages().map((p, idx) =>
-              p === "..." ? (
-                <span
-                  key={idx}
-                  className="px-2 text-muted"
-                >
-                  ...
-                </span>
-              ) : (
-                <button
-                  key={idx}
-                  className={`btn rounded-pill ${
-                    p === page
-                      ? "btn-primary shadow-sm"
-                      : "btn-light border"
-                  }`}
-                  style={{
-                    minWidth: "42px",
-                    height: "42px",
-                  }}
-                  onClick={() =>
-                    fetchResidents(p, search)
-                  }
-                >
-                  {p}
-                </button>
-              )
-            )}
+              <ul className="pagination pagination-sm mb-0">
 
-            {/* NEXT */}
-            <button
-              className="btn btn-light border rounded-pill px-3"
-              disabled={page === lastPage}
-              onClick={() =>
-                fetchResidents(page + 1, search)
-              }
-            >
-              Next →
-            </button>
+                <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => fetchResidents(page - 1, search)}
+                  >
+                    Prev
+                  </button>
+                </li>
 
-          </div>
+                {getPages().map((p, i) =>
+                  p === "..." ? (
+                    <li key={i} className="page-item disabled">
+                      <span className="page-link">...</span>
+                    </li>
+                  ) : (
+                    <li key={i} className={`page-item ${p === page ? "active" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => fetchResidents(p, search)}
+                      >
+                        {p}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                <li className={`page-item ${page === lastPage ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => fetchResidents(page + 1, search)}
+                  >
+                    Next
+                  </button>
+                </li>
+
+              </ul>
+
+            </div>
+          )}
 
         </div>
       </div>
 
-      {/* ================= CREATE MODAL ================= */}
-      {modalOpen && mode === "create" && (
+      {/* ================= VIEW MODAL ================= */}
+      {showActionModal && selectedResident && (
         <div
           className="modal d-block"
-          style={{
-            background: "rgba(0,0,0,0.6)",
-            backdropFilter: "blur(4px)",
-          }}
+          style={{ background: "rgba(0,0,0,0.55)" }}
         >
-          <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-
-            <div className="modal-content rounded-4 shadow-lg border-0 overflow-hidden">
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content border-0 rounded-4 shadow-lg">
 
               {/* HEADER */}
-              <div className="modal-header border-0 bg-light px-4 py-3">
-
+              <div className="modal-header py-2 px-3">
                 <div>
-                  <h5 className="mb-0 fw-bold">
-                    Add Resident
-                  </h5>
-
-                  <small className="text-muted">
-                    Create resident profile and
-                    census information
+                  <h6 className="mb-0 fw-bold">Resident Profile</h6>
+                  <small className="text-muted" style={{ fontSize: "11px" }}>
+                    Basic information overview
                   </small>
                 </div>
 
                 <button
                   className="btn-close"
-                  onClick={() =>
-                    setModalOpen(false)
-                  }
+                  onClick={() => setShowActionModal(false)}
                 />
-
               </div>
 
-              <form onSubmit={handleSubmit}>
+              {/* BODY */}
+              <div className="modal-body p-3">
 
-                <div className="modal-body px-4 py-3">
+                {/* NAME CARD */}
+                <div className="text-center mb-3">
+                  <div
+                    className="text-uppercase rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2"
+                    style={{ width: "60px", height: "60px", fontSize: "20px" }}
+                  >
+                    {selectedResident.first_name?.charAt(0)}
+                    {selectedResident.last_name?.charAt(0)}
+                  </div>
 
-                  <div className="row g-4">
+                  <h6 className="mb-0 fw-bold text-capitalize">
+                    {selectedResident.first_name} {selectedResident.last_name}
+                  </h6>
 
-                    {/* PERSONAL */}
-                    <div className="col-12">
-                      <div className="border rounded-4 p-4">
+                  <small className="text-muted">
+                    {selectedResident.barangay || "No barangay"}
+                  </small>
+                </div>
 
-                        <h5 className="fw-bold mb-3">
-                          Personal Information
-                        </h5>
+                {/* INFO GRID */}
+                <div className="row g-2">
 
-                        <div className="row g-3">
-
-                          <div className="col-md-4">
-                            <label className="form-label fw-semibold">
-                              First Name
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="first_name"
-                              value={
-                                form.first_name
-                              }
-                              onChange={
-                                handleChange
-                              }
-                              required
-                            />
-                          </div>
-
-                          <div className="col-md-4">
-                            <label className="form-label fw-semibold">
-                              Middle Name
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="middle_name"
-                              value={
-                                form.middle_name
-                              }
-                              onChange={
-                                handleChange
-                              }
-                            />
-                          </div>
-
-                          <div className="col-md-4">
-                            <label className="form-label fw-semibold">
-                              Last Name
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="last_name"
-                              value={
-                                form.last_name
-                              }
-                              onChange={
-                                handleChange
-                              }
-                              required
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Gender
-                            </label>
-
-                            <select
-                              className="form-select"
-                              name="gender"
-                              value={form.gender}
-                              onChange={
-                                handleChange
-                              }
-                              required
-                            >
-                              <option value="">
-                                Select gender
-                              </option>
-
-                              <option value="Male">
-                                Male
-                              </option>
-
-                              <option value="Female">
-                                Female
-                              </option>
-                            </select>
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Civil Status
-                            </label>
-
-                            <select
-                              className="form-select"
-                              name="civil_status"
-                              value={
-                                form.civil_status
-                              }
-                              onChange={
-                                handleChange
-                              }
-                              required
-                            >
-                              <option value="">
-                                Select status
-                              </option>
-
-                              <option value="Single">
-                                Single
-                              </option>
-
-                              <option value="Married">
-                                Married
-                              </option>
-
-                              <option value="Widowed">
-                                Widowed
-                              </option>
-                            </select>
-                          </div>
-
-                        </div>
-
+                  <div className="col-6">
+                    <div className="border rounded-3 p-2">
+                      <small className="text-muted">Gender</small>
+                      <div className="fw-semibold">
+                        {selectedResident.gender || "-"}
                       </div>
                     </div>
+                  </div>
 
-                    {/* ADDRESS */}
-                    <div className="col-12">
-                      <div className="border rounded-4 p-4">
-
-                        <h5 className="fw-bold mb-3">
-                          Address Information
-                        </h5>
-
-                        <div className="row g-3">
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Barangay
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="barangay"
-                              value={form.barangay}
-                              onChange={
-                                handleChange
-                              }
-                              required
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Purok / Zone
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="purok_zone"
-                              value={
-                                form.purok_zone
-                              }
-                              onChange={
-                                handleChange
-                              }
-                              required
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Street Address
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="street_address"
-                              value={
-                                form.street_address
-                              }
-                              onChange={
-                                handleChange
-                              }
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              City / Municipality
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="city_municipality"
-                              value={
-                                form.city_municipality
-                              }
-                              onChange={
-                                handleChange
-                              }
-                            />
-                          </div>
-
-                        </div>
-
+                  <div className="col-6">
+                    <div className="border rounded-3 p-2">
+                      <small className="text-muted">Mobile</small>
+                      <div className="fw-semibold">
+                        {formatMobile(selectedResident.mobile_number) || "-"}
                       </div>
                     </div>
+                  </div>
 
-                    {/* OTHER */}
-                    <div className="col-12">
-                      <div className="border rounded-4 p-4">
-
-                        <h5 className="fw-bold mb-3">
-                          Other Information
-                        </h5>
-
-                        <div className="row g-3">
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Mobile Number
-                            </label>
-
-                            <input
-                              className="form-control"
-                              name="mobile_number"
-                              value={
-                                form.mobile_number
-                              }
-                              onChange={
-                                handleChange
-                              }
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label fw-semibold">
-                              Email
-                            </label>
-
-                            <input
-                              type="email"
-                              className="form-control"
-                              name="email"
-                              value={form.email}
-                              onChange={
-                                handleChange
-                              }
-                            />
-                          </div>
-
-                        </div>
-
+                  <div className="col-12">
+                    <div className="border rounded-3 p-2">
+                      <small className="text-muted">Barangay</small>
+                      <div className="fw-semibold">
+                        {selectedResident.barangay || "-"}
                       </div>
                     </div>
+                  </div>
 
+                  <div className="col-12">
+                    <div className="border rounded-3 p-2 d-flex justify-content-between align-items-center">
+                      <div>
+                        <small className="text-muted">Voter Status</small>
+                        <div className="fw-semibold">
+                          {selectedResident.is_voter ? "YES" : "NO"}
+                        </div>
+                      </div>
+
+                
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* FOOTER */}
+              <div className="modal-footer py-2 px-3">
+                <button
+                  className="btn btn-light btn-sm w-100"
+                  onClick={() => setShowActionModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && editForm && (
+        <div className="modal d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content rounded-3">
+
+              {/* HEADER */}
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Resident</h5>
+                <button
+                  className="btn-close"
+                  onClick={() => setShowEditModal(false)}
+                />
+              </div>
+
+              {/* BODY */}
+              <div className="modal-body">
+
+                <div className="row g-3">
+
+                  <div className="col-6">
+                    <label className="form-label ">First Name <span className="text-danger">*</span></label>
+                    <input
+                      className="form-control text-capitalize"
+                      value={editForm.first_name || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, first_name: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-6">
+                    <label className="form-label">Last Name <span className="text-danger">*</span></label>
+                    <input
+                      className="form-control text-capitalize"
+                      value={editForm.last_name || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, last_name: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Gender <span className="text-danger">*</span></label>
+                    <select
+                      className="form-select"
+                      value={editForm.gender || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, gender: e.target.value })
+                      }
+                    >
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Civil Status <span className="text-danger">*</span></label>
+                    <select
+                      className="form-select"
+                      value={editForm.civil_status || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, civil_status: e.target.value })
+                      }
+                    >
+                      <option value="">Select</option>
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                      <option value="Widowed">Widowed</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Purok / Sitio / Zone <span className="text-danger">*</span></label>
+                    <input
+                      className="form-control"
+                      value={editForm.purok_zone || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, purok_zone: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Mobile <span className="text-danger">*</span></label>
+                    <input
+                      className="form-control"
+                      value={editForm.mobile_number || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, mobile_number: e.target.value })
+                      }
+                    />
                   </div>
 
                 </div>
 
-                {/* FOOTER */}
-                <div className="modal-footer border-0 px-4 py-3 d-flex justify-content-between">
+              </div>
 
-                  <small className="text-muted">
-                    Fields marked required must be
-                    completed
+              {/* FOOTER */}
+              <div className="modal-footer">
+
+                <button
+                  className="btn btn-light"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="btn btn-primary"
+                  onClick={handleUpdate}
+                >
+                  Save Changes
+                </button>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalOpen && mode === "create" && (
+        <div
+          className="modal fade show d-block"
+          style={{ background: "rgba(0,0,0,0.6)" }}
+        >
+          <div className="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div className="modal-content border-0 rounded-4 shadow">
+
+              {/* HEADER */}
+              <div className="modal-header py-2 px-3">
+                <div>
+                  <h6 className="mb-0 fw-bold">Add Resident</h6>
+                  <small className="text-muted" style={{ fontSize: "11px" }}>
+                    Quick barangay registration
                   </small>
+                </div>
 
-                  <div className="d-flex gap-2">
+                <button
+                  className="btn-close"
+                  onClick={() => setModalOpen(false)}
+                />
+              </div>
 
-                    <button
-                      type="button"
-                      className="btn btn-light px-3"
-                      onClick={() =>
-                        setModalOpen(false)
-                      }
-                    >
-                      Cancel
-                    </button>
+              {/* FORM */}
+              <form onSubmit={handleSubmit}>
+                <div className="modal-body p-3">
 
-                    <button
-                      type="submit"
-                      className="btn btn-primary px-4"
-                    >
-                      Save Resident
-                    </button>
+                  
 
+                  <div className="row g-2 mb-3">
+                    {/* NAME */}
+                    <div className="col-6">
+                      <label className="form-label small mb-1">First Name <span className="text-danger">*</span></label>
+                      <input
+                        className="form-control form-control-sm text-capitalize"
+                        name="first_name"
+                        value={form.first_name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-6">
+                      <label className="form-label small mb-1">Middle Name <span className="text-danger">*</span></label>
+                      <input
+                        className="form-control form-control-sm text-capitalize"
+                        name="middle_name"
+                        value={form.middle_name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="col-6">
+                      <label className="form-label small mb-1">Last Name <span className="text-danger">*</span></label>
+                      <input
+                        className="form-control form-control-sm text-capitalize"
+                        name="last_name"
+                        value={form.last_name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+             
+       
+                    <div className="col-6">
+                        <label className="form-label small mb-1">Sitio / Purok / Zone <span className="text-danger">*</span></label>
+                        <input
+                          className="form-control form-control-sm mb-2 text-capitalize"
+                          name="purok_zone"
+                          value={form.purok_zone}
+                          onChange={handleChange}
+                          required
+                        />
+                    </div>
+
+
+                    {/* CONTACT */}
+                    <div className="col-6">
+                      <label className="form-label small mb-1">Mobile Number <span className="text-danger">*</span></label>
+                      <input
+                        className="form-control form-control-sm"
+                        name="mobile_number"
+                        value={form.mobile_number}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-6">
+                      <label className="form-label small mb-1">Household Number <span className="text-danger">*</span></label>
+                        <input
+                          className="form-control form-control-sm"
+                          name="household_number"
+                          value={form.household_number}
+                          onChange={handleChange}
+                          required
+                        />
+                    </div>
+
+
+                  {/* BASIC INFO */}
+         
+                    <div className="col-6">
+                      <label className="form-label small mb-1">Gender <span className="text-danger">*</span></label>
+                      <select
+                        className="form-select form-select-sm"
+                        name="gender"
+                        value={form.gender}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </div>
+                    
+                    <div className="col-6">
+                      <label className="form-label small mb-1">Civil Status <span className="text-danger">*</span></label>
+                      <select
+                        className="form-select form-select-sm"
+                        name="civil_status"
+                        value={form.civil_status}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Civil Status *</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                        <option value="Divorced">Divorced</option>
+                      </select>
+                    </div>
                   </div>
 
+              
+
+                </div>
+
+                {/* FOOTER */}
+                <div className="modal-footer py-2 px-3">
+                  <button
+                    type="button"
+                    className="btn btn-light btn-sm"
+                    onClick={() => setModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+
+                  <button type="submit" className="btn btn-primary btn-sm">
+                    Save
+                  </button>
                 </div>
 
               </form>
 
             </div>
-
           </div>
         </div>
       )}
-
-      {/* ================= VIEW / EDIT ================= */}
-      {modalOpen &&
-        selectedResident &&
-        (mode === "view" ||
-          mode === "edit") && (
-          <div
-            className="modal d-block"
-            style={{
-              background:
-                "rgba(0,0,0,0.6)",
-              backdropFilter: "blur(4px)",
-            }}
-          >
-            <div className="modal-dialog modal-xl modal-dialog-centered">
-
-              <div
-                className="modal-content rounded-4 shadow-lg overflow-hidden"
-                style={{
-                  maxHeight: "90vh",
-                }}
-              >
-
-                {/* HEADER */}
-                <div className="px-4 py-3 bg-light border-bottom d-flex justify-content-between align-items-center">
-
-                  <div>
-                    <h5 className="mb-0 fw-bold">
-                      {isEditing
-                        ? "Edit Resident"
-                        : "Resident Profile"}
-                    </h5>
-
-                    <small className="text-muted">
-                      {isEditing
-                        ? "Update resident information"
-                        : "View resident details"}
-                    </small>
-                  </div>
-
-                  <button
-                    className="btn-close"
-                    onClick={() => {
-                      setModalOpen(false);
-                      setSelectedResident(
-                        null
-                      );
-                      setIsEditing(false);
-                    }}
-                  />
-
-                </div>
-
-                {/* CONTENT */}
-                <div
-                  className="p-4"
-                  style={{
-                    overflowY: "auto",
-                  }}
-                >
-
-                  {!isEditing ? (
-                   <>
-                    <div className="row g-4">
-
-                      {/* ================= LEFT PROFILE PANEL ================= */}
-                      <div className="col-md-4">
-
-                        <div className="p-4 rounded-4 bg-white shadow-sm h-100">
-
-                          {/* Avatar */}
-                          <div className="text-center mb-4">
-                            <div
-                              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold mx-auto"
-                              style={{ width: 100, height: 100, fontSize: 32 }}
-                            >
-                              {selectedResident.first_name?.[0]}
-                              {selectedResident.last_name?.[0]}
-                            </div>
-
-                            <h4 className="fw-bold mt-3 mb-1">
-                              {selectedResident.first_name} {selectedResident.last_name}
-                            </h4>
-
-                            <div className="text-muted small">
-                              Resident Profile Record
-                            </div>
-                          </div>
-
-                          {/* Quick Info */}
-                          <div className="border-top pt-3">
-
-                            <div className="d-flex justify-content-between mb-2">
-                              <span className="text-muted">Gender</span>
-                              <span className="fw-semibold">{selectedResident.gender || "-"}</span>
-                            </div>
-
-                            <div className="d-flex justify-content-between mb-2">
-                              <span className="text-muted">Civil Status</span>
-                              <span className="fw-semibold">{selectedResident.civil_status || "-"}</span>
-                            </div>
-
-                            <div className="d-flex justify-content-between mb-2">
-                              <span className="text-muted">Age</span>
-                              <span className="fw-semibold">
-                                {selectedResident.birth_date
-                                  ? new Date().getFullYear() -
-                                    new Date(selectedResident.birth_date).getFullYear()
-                                  : "-"}
-                              </span>
-                            </div>
-
-                            <div className="d-flex justify-content-between">
-                              <span className="text-muted">Barangay</span>
-                              <span className="fw-semibold">
-                                {selectedResident.barangay || "-"}
-                              </span>
-                            </div>
-
-                          </div>
-
-                        </div>
-                      </div>
-
-                      {/* ================= RIGHT CONTENT ================= */}
-                      <div className="col-md-8">
-
-                        <div className="p-4 rounded-4 bg-white shadow-sm">
-
-                          {/* SECTION TITLE */}
-                          <h5 className="fw-bold mb-4">Resident Information Record</h5>
-
-                          {/* ================= PERSONAL ================= */}
-                          <div className="mb-4">
-                            <h6 className="text-uppercase text-muted small mb-3">
-                              Personal Information
-                            </h6>
-
-                            <div className="row">
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Birth Date</span>
-                                <div className="fw-semibold">
-                                  {selectedResident.birth_date
-                                    ? new Date(selectedResident.birth_date).toLocaleDateString()
-                                    : "-"}
-                                </div>
-                              </div>
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Gender</span>
-                                <div className="fw-semibold">
-                                  {selectedResident.gender || "-"}
-                                </div>
-                              </div>
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Civil Status</span>
-                                <div className="fw-semibold">
-                                  {selectedResident.civil_status || "-"}
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-
-                          {/* DIVIDER */}
-                          <hr />
-
-                          {/* ================= ADDRESS ================= */}
-                          <div className="mb-4">
-                            <h6 className="text-uppercase text-muted small mb-3">
-                              Address Information
-                            </h6>
-
-                            <div className="row">
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Barangay</span>
-                                <div className="fw-semibold">{selectedResident.barangay || "-"}</div>
-                              </div>
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Purok / Zone</span>
-                                <div className="fw-semibold">{selectedResident.purok_zone || "-"}</div>
-                              </div>
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Street</span>
-                                <div className="fw-semibold">{selectedResident.street_address || "-"}</div>
-                              </div>
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">City / Municipality</span>
-                                <div className="fw-semibold">
-                                  {selectedResident.city_municipality || "-"}
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-
-                          <hr />
-
-                          {/* ================= CONTACT ================= */}
-                          <div className="mb-4">
-                            <h6 className="text-uppercase text-muted small mb-3">
-                              Contact Information
-                            </h6>
-
-                            <div className="row">
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Mobile</span>
-                                <div className="fw-semibold">
-                                  {selectedResident.mobile_number || "-"}
-                                </div>
-                              </div>
-
-                              <div className="col-md-6 mb-2">
-                                <span className="text-muted">Email</span>
-                                <div className="fw-semibold">
-                                  {selectedResident.email || "-"}
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-
-                          <hr />
-
-                          {/* ================= STATUS (LIVEBIRTH STYLE TAGS) ================= */}
-                          <div>
-                            <h6 className="text-uppercase text-muted small mb-3">
-                              Status & Classification
-                            </h6>
-
-                            <div className="d-flex flex-wrap gap-2">
-
-                              <span className={`px-3 py-1 rounded-pill small fw-semibold ${
-                                selectedResident.household_head
-                                  ? "bg-success text-white"
-                                  : "bg-light text-dark border"
-                              }`}>
-                                Household Head
-                              </span>
-
-                              <span className={`px-3 py-1 rounded-pill small fw-semibold ${
-                                selectedResident.is_voter
-                                  ? "bg-primary text-white"
-                                  : "bg-light text-dark border"
-                              }`}>
-                                Registered Voter
-                              </span>
-
-                              <span className={`px-3 py-1 rounded-pill small fw-semibold ${
-                                selectedResident.disability_status
-                                  ? "bg-warning text-dark"
-                                  : "bg-light text-dark border"
-                              }`}>
-                                PWD
-                              </span>
-
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-
-                    </div>
-                  </>
-                  ) : (
-                    <div className="row g-3">
-
-                      {Object.keys(editForm).map(
-                        (field) => (
-                          <div
-                            className="col-md-6"
-                            key={field}
-                          >
-
-                            <label className="form-label fw-semibold text-capitalize">
-                              {field.replaceAll(
-                                "_",
-                                " "
-                              )}
-                            </label>
-
-                            {typeof editForm[
-                              field
-                            ] === "boolean" ? (
-                              <div className="form-check">
-
-                                <input
-                                  type="checkbox"
-                                  className="form-check-input"
-                                  checked={
-                                    editForm[
-                                      field
-                                    ]
-                                  }
-                                  onChange={(e) =>
-                                    setEditForm({
-                                      ...editForm,
-                                      [field]:
-                                        e.target
-                                          .checked,
-                                    })
-                                  }
-                                />
-
-                              </div>
-                            ) : (
-                              <input
-                                className="form-control"
-                                value={
-                                  editForm[
-                                    field
-                                  ] || ""
-                                }
-                                onChange={(e) =>
-                                  setEditForm({
-                                    ...editForm,
-                                    [field]:
-                                      e.target
-                                        .value,
-                                  })
-                                }
-                              />
-                            )}
-
-                          </div>
-                        )
-                      )}
-
-                    </div>
-                  )}
-
-                </div>
-
-                {/* FOOTER */}
-                <div className="modal-footer border-0 px-4 py-3 d-flex justify-content-end">
-
-                  <div className="d-flex gap-2">
-
-                    {!isEditing ? (
-                      <button
-                        className="btn btn-primary px-3"
-                        onClick={() =>
-                          setIsEditing(true)
-                        }
-                      >
-                        Edit
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          className="btn btn-success px-3"
-                          onClick={handleUpdate}
-                        >
-                          Save Changes
-                        </button>
-
-                        <button
-                          className="btn btn-secondary px-3"
-                          onClick={() => {
-                            setIsEditing(false);
-
-                            setEditForm({
-                              ...selectedResident,
-                            });
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    )}
-
-                    <button
-                      className="btn btn-dark px-3"
-                      onClick={() => {
-                        setModalOpen(false);
-                        setSelectedResident(
-                          null
-                        );
-                        setIsEditing(false);
-                      }}
-                    >
-                      Close
-                    </button>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        )}
 
     </div>
   );

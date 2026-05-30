@@ -59,6 +59,10 @@
     font-size: 14px;
   }
 
+  .table-hover-row:hover {
+    background-color: #f8f9fa;
+  }
+
 
   
 }

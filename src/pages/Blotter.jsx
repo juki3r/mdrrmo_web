@@ -15,6 +15,11 @@ export default function Blotter() {
   const [lastPage, setLastPage] = useState(1);
   const [search, setSearch] = useState("");
 
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusValue, setStatusValue] = useState("");
+
   const token = localStorage.getItem("token");
 
   const [form, setForm] = useState({
@@ -145,6 +150,19 @@ export default function Blotter() {
     }
   };
 
+  const filteredBlotters = blotters.filter((b) => {
+    const matchSearch =
+      b.blotter_number?.toLowerCase().includes(search.toLowerCase()) ||
+      b.incident_type?.toLowerCase().includes(search.toLowerCase()) ||
+      b.incident_location?.toLowerCase().includes(search.toLowerCase()) ||
+      b.complainant_name?.toLowerCase().includes(search.toLowerCase());
+
+    const matchStatus =
+      statusFilter === "all" ? true : b.status === statusFilter;
+
+    return matchSearch && matchStatus;
+  });
+
   // =========================
   // DELETE
   // =========================
@@ -239,644 +257,391 @@ export default function Blotter() {
     return rangeWithDots;
   };
 
-  return (
-    <div className="container-fluid p-4">
+ return (
+  <div className="container-fluid py-4">
 
-      {/* HEADER */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+    {/* ================= HEADER ================= */}
+    <div className="card shadow-sm border-0 mb-3">
+      <div className="card-body">
 
-        <div className="position-relative" style={{ width: "350px" }}>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold mb-0">Blotter Management</h5>
 
-            {/* SEARCH ICON */}
-            <i
-              className="bi bi-search position-absolute"
-              style={{
-                top: "50%",
-                left: "12px",
-                transform: "translateY(-50%)",
-                color: "#94a3b8",
-                fontSize: "14px",
-              }}
-            />
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowModal(true)}
+          >
+            <i className="bi bi-plus-lg me-2"></i>
+            Add Blotter
+          </button>
+        </div>
 
-            {/* INPUT */}
-            <input
-              className="form-control"
-              placeholder="Search blotter..."
-              value={search}
-              onChange={(e) => {
-                const value = e.target.value;
-                setSearch(value);
-                setPage(1);
-                fetchBlotters(1, value);
-              }}
-              style={{
-                paddingLeft: "40px",
-                paddingRight: "40px",
-              }}
-            />
+        {/* SEARCH */}
+        <div className="row g-2">
+          <div className="col-md-8">
+            <div className="input-group">
+              <span className="input-group-text bg-white">
+                <i className="bi bi-search"></i>
+              </span>
 
-            {/* CLEAR BUTTON (X) */}
-            {search && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearch("");
-                  fetchBlotters(1, "");
+              <input
+                className="form-control"
+                placeholder="Search blotters..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  fetchBlotters(1, e.target.value);
                 }}
-                className="btn p-0 border-0 position-absolute"
-                style={{
-                  top: "50%",
-                  right: "12px",
-                  transform: "translateY(-50%)",
-                  background: "transparent",
-                  color: "#94a3b8",
-                }}
-              >
-                <i className="bi bi-x-circle-fill" style={{ fontSize: "16px" }} />
-              </button>
-            )}
-
+              />
+            </div>
           </div>
-
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowModal(true)}
-        >
-          <i className="bi bi-plus-lg me-1"></i>
-          Add Blotter
-        </button>
+          <div className="col-md-4">
+            <select
+              className="form-select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Dismissed">Dismissed</option>
+            </select>
+          </div>
+        </div>
 
       </div>
+    </div>
 
-      {/* TABLE */}
-      <div className="card shadow-sm border-0">
-        <div className="card-body">
+    {/* ================= TABLE ================= */}
+    <div className="card shadow-sm border-0">
+      <div className="card-body">
 
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle">
+        {loading ? (
+          <div className="text-center py-5">Loading...</div>
+        ) : (
+          <div className="table-responsive">
 
-                <thead className="table-light">
-                  <tr>
-                    <th>#</th>
-                    <th>Blotter number</th>
-                    <th>Complainant</th>
-                    <th>Respondent</th>
-                    <th>Incident</th>
-                    <th>Location</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                    <th className="text-end">Actions</th>
-                  </tr>
-                </thead>
+            <table className="table table-hover align-middle small">
+              <thead className="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Blotter No</th>
+                  <th>Complainant</th>
+                  <th>Respondent</th>
+                  <th>Incident Type</th>
+                  <th>Location</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th className="text-end">Actions</th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  {blotters.length > 0 ? (
-                    blotters.map((b, i) => (
-                      <tr key={b.id}>
-                        <td>{(page - 1) * 10 + i + 1}</td>
-                        <td>{b.blotter_number}</td>
-                        <td>{b.complainant_name}</td>
-                        <td>{b.respondent_name ? b.respondent_name : "-"}</td>
-                        <td>{b.incident_type}</td>
-                        <td>{b.incident_location}</td>
-                        <td>
-                            {new Date(b.incident_date).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                              day: "2-digit",
-                            })}
-                          </td>
-                          <td>
-                            {b.incident_time
-                              ? new Date(`1970-01-01T${b.incident_time}`).toLocaleTimeString(
-                                  "en-US",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                  }
-                                )
-                              : "-"}
-                          </td>
+              <tbody>
+                {blotters.length > 0 ? (
+                  filteredBlotters.map((b, i) => (
+                    <tr
+                        key={b.id}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setSelectedBlotter(b);
+                          setShowActionModal(true);
+                        }}
+                      >
 
-                        <td>
-                          <span className={`badge ${
-                            b.status === "Resolved"
-                              ? "bg-success"
-                              : b.status === "Ongoing"
-                              ? "bg-warning text-dark"
-                              : b.status === "Dismissed"
-                              ? "bg-danger"
-                              : "bg-secondary"
-                          }`}>
-                            {b.status}
-                          </span>
-                        </td>
+                      <td>{(page - 1) * 10 + i + 1}</td>
+                      <td className="fw-semibold">{b.blotter_number}</td>
 
-                        <td className="text-end d-flex gap-2 justify-content-end">
+                      <td>{b.complainant_name}</td>
+                      <td>{b.respondent_name || "-"}</td>
 
-                          {/* VIEW */}
-                          <button
-                            className="btn btn-primary btn-sm d-flex align-items-center gap-1"
-                            onClick={() => {
+                      <td>{b.incident_type}</td>
+                      <td>{b.incident_location}</td>
+
+                      <td>
+                        {new Date(b.incident_date).toLocaleString("en-PH", {
+                          year: "numeric",
+                          month: "short",
+                          day: "2-digit",
+                        })}
+                      </td>
+
+                      <td>
+                        {b.incident_time
+                          ? new Date(`1970-01-01T${b.incident_time}`).toLocaleTimeString(
+                              "en-PH",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <span className={`badge bg-${
+                          b.status === "Resolved"
+                            ? "success"
+                            : b.status === "Ongoing"
+                            ? "primary"
+                            : b.status === "Dismissed"
+                            ? "danger"
+                            : "secondary"
+                        }`}>
+                          {b.status}
+                        </span>
+                      </td>
+
+                      <td className="text-end">
+
+                        <button
+                          className="btn btn-sm btn-outline-warning me-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBlotter(b);
+                            setStatusValue(b.status);
+                            setShowStatusModal(true);
+                          }}
+                        >
+                          Status
+                        </button>
+
+                        <button
+                            className="btn btn-sm btn-outline-primary me-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedBlotter(b);
                               setShowActionModal(true);
                             }}
                           >
-                            <i className="bi bi-eye"></i>
-                            <span>View</span>
+                            View
                           </button>
 
-                          {/* DELETE */}
-                          <button
-                            className="btn btn-danger btn-sm d-flex align-items-center gap-1"
-                            onClick={() => handleDelete(b.id)}
-                          >
-                            <i className="bi bi-trash"></i>
-                            <span>Delete</span>
-                          </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDelete(b.id)}
+                        >
+                          Delete
+                        </button>
 
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="10" className="text-center py-5">
-                          <div className="d-flex flex-column align-items-center justify-content-center">
+                      </td>
 
-                            <i
-                              className="bi bi-inbox"
-                              style={{
-                                fontSize: "48px",
-                                color: "#cbd5e1",
-                                marginBottom: "10px",
-                              }}
-                            ></i>
-
-                            <h6 className="fw-semibold mb-1 text-muted">
-                              No blotters found
-                            </h6>
-
-                          </div>
-                        </td>
                     </tr>
-                  )}
-                </tbody>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="10" className="text-center py-5">
+                      No blotters found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
 
-              </table>
+            </table>
+          </div>
+        )}
+
+        {/* ================= PAGINATION ================= */}
+        {lastPage > 1 && (
+          <div className="d-flex justify-content-between align-items-center mt-4">
+
+            <div className="text-muted small">
+              Page {page} of {lastPage}
             </div>
-          )}
 
-          {/* PAGINATION */}
-         <div className="d-flex justify-content-center align-items-center mt-4 gap-2 flex-wrap">
+            <nav>
+              <ul className="pagination pagination-sm mb-0">
 
-          {/* PREV */}
-          <button
-            className="btn btn-light border rounded-pill px-3"
-            disabled={page === 1}
-            onClick={() => fetchBlotters(page - 1, search)}
-          >
-            ← Prev
-          </button>
+                <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => fetchBlotters(page - 1, search)}
+                  >
+                    Prev
+                  </button>
+                </li>
 
-          {/* PAGE NUMBERS */}
-          {getPages().map((p, idx) =>
-            p === "..." ? (
-              <span key={idx} className="px-2 text-muted">
-                ...
-              </span>
-            ) : (
+                {getPages().map((p, i) =>
+                  p === "..." ? (
+                    <li key={i} className="page-item disabled">
+                      <span className="page-link">...</span>
+                    </li>
+                  ) : (
+                    <li
+                      key={i}
+                      className={`page-item ${p === page ? "active" : ""}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => fetchBlotters(p, search)}
+                      >
+                        {p}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                <li className={`page-item ${page === lastPage ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => fetchBlotters(page + 1, search)}
+                  >
+                    Next
+                  </button>
+                </li>
+
+              </ul>
+            </nav>
+
+          </div>
+        )}
+
+      </div>
+    </div>
+
+    {showActionModal && selectedBlotter && (
+      <div className="modal d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
+        <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-content">
+
+            {/* HEADER */}
+            <div className="p-3 border-bottom d-flex justify-content-between">
+              <div>
+                <h5 className="fw-bold mb-0">Blotter Details</h5>
+                <small className="text-muted">
+                  #{selectedBlotter.blotter_number}
+                </small>
+              </div>
+
               <button
-                key={idx}
-                className={`btn rounded-pill ${
-                  p === page ? "btn-primary shadow-sm" : "btn-light border"
-                }`}
-                style={{
-                  minWidth: "42px",
-                  height: "42px",
-                }}
-                onClick={() => fetchBlotters(p, search)}
+                className="btn-close"
+                onClick={() => setShowActionModal(false)}
+              />
+            </div>
+
+            {/* BODY */}
+            <div className="p-4">
+
+              <div className="mb-3">
+                <span className="badge bg-primary text-uppercase">
+                  {selectedBlotter.status}
+                </span>
+              </div>
+
+              <div className="row g-3">
+
+                <div className="col-md-6">
+                  <div className="border rounded p-3 bg-light">
+                    <small className="text-muted">Incident Type</small>
+                    <div className="fw-semibold">
+                      {selectedBlotter.incident_type}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="border rounded p-3 bg-light">
+                    <small className="text-muted">Location</small>
+                    <div className="fw-semibold">
+                      {selectedBlotter.incident_location}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-12">
+                  <div className="border rounded p-3 bg-light">
+                    <small className="text-muted">Details</small>
+                    <div className="fw-semibold">
+                      {selectedBlotter.incident_details}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* FOOTER (VIEW ONLY ACTIONS) */}
+            <div className="p-3 border-top d-flex justify-content-end">
+
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowActionModal(false)}
               >
-                {p}
+                Close
               </button>
-            )
-          )}
 
-          {/* NEXT */}
-          <button
-            className="btn btn-light border rounded-pill px-3"
-            disabled={page === lastPage}
-            onClick={() => fetchBlotters(page + 1, search)}
-          >
-            Next →
-          </button>
+            </div>
 
-        </div>
-
+          </div>
         </div>
       </div>
+    )}
 
-      {/* VIEW / ACTION MODAL */}
-      {showActionModal && selectedBlotter && (
-        <div
-          className="modal d-block"
-          style={{ background: "rgba(0,0,0,0.5)" }}
-        >
-          <div className="modal-dialog modal-lg modal-dialog-centered">
-            <div className="modal-content border-0 rounded-4 shadow">
 
-              {/* HEADER */}
-              <div className="p-4 border-bottom d-flex justify-content-between align-items-start">
-                <div>
-                  <h5 className="fw-bold mb-1">Blotter Details</h5>
-                  <small className="text-muted">
-                    Case #: {selectedBlotter.blotter_number || "N/A"}
-                  </small>
-                </div>
+    {showStatusModal && selectedBlotter && (
+      <div className="modal d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
 
-                <button
-                  className="btn-close"
-                  onClick={() => setShowActionModal(false)}
-                />
-              </div>
+            {/* HEADER */}
+            <div className="modal-header">
+              <h5 className="modal-title">Update Status</h5>
+              <button
+                className="btn-close"
+                onClick={() => setShowStatusModal(false)}
+              />
+            </div>
 
-              {/* BODY */}
-              <div className="p-4">
+            {/* BODY */}
+            <div className="modal-body">
 
-                {/* STATUS BADGE */}
-                <div className="mb-3">
-                  <span
-                    className={`px-3 py-1 rounded-pill small fw-semibold ${
-                      selectedBlotter.status === "Resolved"
-                        ? "bg-success text-white"
-                        : selectedBlotter.status === "Ongoing"
-                        ? "bg-warning text-dark"
-                        : selectedBlotter.status === "Dismissed"
-                        ? "bg-danger text-white"
-                        : "bg-secondary text-white"
-                    }`}
-                  >
-                    {selectedBlotter.status}
-                  </span>
-                </div>
+              <p className="mb-2">
+                Blotter #: <strong>{selectedBlotter.blotter_number}</strong>
+              </p>
 
-                {/* GRID DETAILS */}
-                <div className="row g-3">
+              <label className="form-label">Select Status</label>
 
-                  <div className="col-md-6">
-                    <div className="border rounded-3 p-3 bg-light">
-                      <small className="text-muted">Incident Type</small>
-                      <div className="fw-semibold">{selectedBlotter.incident_type}</div>
-                    </div>
-                  </div>
-
-                  <div className="col-md-6">
-                    <div className="border rounded-3 p-3 bg-light">
-                      <small className="text-muted">Location</small>
-                      <div className="fw-semibold">
-                        {selectedBlotter.incident_location}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-12">
-                    <div className="border rounded-3 p-3 bg-light">
-                      <small className="text-muted">Details</small>
-                      <div className="fw-semibold">
-                        {selectedBlotter.incident_details}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-md-6">
-                    <div className="border rounded-3 p-3 bg-light">
-                      <small className="text-muted">Complainant</small>
-                      <div className="fw-semibold">
-                        {selectedBlotter.complainant_name}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-md-6">
-                    <div className="border rounded-3 p-3 bg-light">
-                      <small className="text-muted">Respondent</small>
-                      <div className="fw-semibold">
-                        {selectedBlotter.respondent_name || "N/A"}
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* FOOTER ACTIONS */}
-              <div className="p-3 border-top bg-white d-flex justify-content-end gap-2">
-
-                <button
-                  className="btn btn-warning d-flex align-items-center gap-1"
-                  onClick={() =>
-                    updateStatus(selectedBlotter.id, "Ongoing")
-                  }
-                >
-                  <i className="bi bi-arrow-repeat"></i>
-                  Ongoing
-                </button>
-
-                <button
-                  className="btn btn-success d-flex align-items-center gap-1"
-                  onClick={() =>
-                    updateStatus(selectedBlotter.id, "Resolved")
-                  }
-                >
-                  <i className="bi bi-check-circle"></i>
-                  Resolved
-                </button>
-
-                <button
-                  className="btn btn-danger d-flex align-items-center gap-1"
-                  onClick={() =>
-                    updateStatus(selectedBlotter.id, "Dismissed")
-                  }
-                >
-                  <i className="bi bi-x-circle"></i>
-                  Dismiss
-                </button>
-
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setShowActionModal(false)}
-                >
-                  Close
-                </button>
-
-              </div>
+              <select
+                className="form-select"
+                value={statusValue}
+                onChange={(e) => setStatusValue(e.target.value)}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Ongoing">Ongoing</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Dismissed">Dismissed</option>
+              </select>
 
             </div>
-          </div>
-        </div>
-      )}
 
+            {/* FOOTER */}
+            <div className="modal-footer">
 
-      {showModal && (
-        <div className="modal d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: "950px" }}>
-            <div className="modal-content rounded-4 shadow">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowStatusModal(false)}
+              >
+                Cancel
+              </button>
 
-              {/* HEADER */}
-              <div className="modal-header border-0">
-                <div>
-                  <h5 className="fw-bold mb-0">Add Blotter Record</h5>
-                  <small className="text-muted">
-                    Fields marked with <span className="text-danger">*</span> are required
-                  </small>
-                </div>
-
-                <button className="btn-close" onClick={() => setShowModal(false)} />
-              </div>
-
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-
-                  {/* ================= INCIDENT INFO ================= */}
-                  <div className="mb-3">
-                    <h6 className="fw-semibold text-primary">Incident Information</h6>
-                    <hr />
-
-                    <div className="row g-3">
-
-                      {/* INCIDENT TYPE */}
-                      <div className="col-md-6">
-                        <label className="form-label">
-                          Incident Type <span className="text-danger">*</span>
-                        </label>
-
-                        <select
-                          name="incident_type"
-                          className="form-control border-primary"
-                          value={form.incident_type}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value="">Select incident type</option>
-                          <option>Theft</option>
-                          <option>Assault</option>
-                          <option>Domestic Violence</option>
-                          <option>Alarm and Scandal</option>
-                          <option>Property Damage</option>
-                          <option>Threat</option>
-                          <option>Missing Person</option>
-                          <option>Fire Incident</option>
-                          <option>Disaster Incident</option>
-                          <option>Others</option>
-                        </select>
-                      </div>
-
-                      {/* CATEGORY */}
-                      <div className="col-md-6">
-                        <label className="form-label">Category</label>
-                        <input
-                          name="incident_category"
-                          className="form-control"
-                          placeholder="Optional"
-                          value={form.incident_category}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* DATE */}
-                      <div className="col-md-6">
-                        <label className="form-label">
-                          Date <span className="text-danger">*</span>
-                        </label>
-
-                        <input
-                          type="date"
-                          name="incident_date"
-                          className="form-control border-primary"
-                          value={form.incident_date}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      {/* TIME */}
-                      <div className="col-md-6">
-                        <label className="form-label">Time</label>
-                        <input
-                          type="time"
-                          name="incident_time"
-                          className="form-control"
-                          value={form.incident_time}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* LOCATION */}
-                      <div className="col-12">
-                        <label className="form-label">
-                          Location <span className="text-danger">*</span>
-                        </label>
-
-                        <input
-                          name="incident_location"
-                          className="form-control border-primary"
-                          placeholder="Exact incident location"
-                          value={form.incident_location}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      {/* DETAILS */}
-                      <div className="col-12">
-                        <label className="form-label">
-                          Incident Details <span className="text-danger">*</span>
-                        </label>
-
-                        <textarea
-                          name="incident_details"
-                          className="form-control border-primary"
-                          placeholder="Describe what happened..."
-                          value={form.incident_details}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* ================= PEOPLE ================= */}
-                  <div className="mb-3">
-                    <h6 className="fw-semibold text-primary">People Involved</h6>
-                    <hr />
-
-                    <div className="row g-3">
-
-                      {/* COMPLAINANT */}
-                      <div className="col-md-6">
-                        <label className="form-label">
-                          Complainant <span className="text-danger">*</span>
-                        </label>
-
-                        <input
-                          name="complainant_name"
-                          className="form-control border-primary"
-                          placeholder="Full name"
-                          value={form.complainant_name}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Contact</label>
-                        <input
-                          name="complainant_contact"
-                          className="form-control"
-                          placeholder="Optional"
-                          value={form.complainant_contact}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* RESPONDENT */}
-                      <div className="col-md-6">
-                        <label className="form-label">Respondent</label>
-                        <input
-                          name="respondent_name"
-                          className="form-control"
-                          placeholder="Optional"
-                          value={form.respondent_name}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Contact</label>
-                        <input
-                          name="respondent_contact"
-                          className="form-control"
-                          placeholder="Optional"
-                          value={form.respondent_contact}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* ================= CLASSIFICATION ================= */}
-                  <div>
-                    <h6 className="fw-semibold text-primary">Classification</h6>
-                    <hr />
-
-                    <div className="row g-3">
-
-                      {/* STATUS */}
-                      <div className="col-md-6">
-                        <label className="form-label">Status</label>
-                        <select
-                          name="status"
-                          className="form-control"
-                          value={form.status || "Pending"}
-                          onChange={handleChange}
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Ongoing">Ongoing</option>
-                          <option value="Resolved">Resolved</option>
-                          <option value="Dismissed">Dismissed</option>
-                        </select>
-                      </div>
-
-                      {/* PRIORITY */}
-                      <div className="col-md-6">
-                        <label className="form-label">Priority Level</label>
-                        <select
-                          name="priority_level"
-                          className="form-control"
-                          value={form.priority_level || "Medium"}
-                          onChange={handleChange}
-                        >
-                          <option value="Low">Low</option>
-                          <option value="Medium">Medium</option>
-                          <option value="High">High</option>
-                          <option value="Critical">Critical</option>
-                        </select>
-                      </div>
-
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* FOOTER */}
-                <div className="modal-footer border-0">
-                  <button
-                    type="button"
-                    className="btn btn-light"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Cancel
-                  </button>
-
-                  <button type="submit" className="btn btn-primary px-4">
-                    Save Blotter
-                  </button>
-                </div>
-
-              </form>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  updateStatus(selectedBlotter.id, statusValue);
+                  setShowStatusModal(false);
+                }}
+              >
+                Save Changes
+              </button>
 
             </div>
+
           </div>
         </div>
-      )}
-
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
 }
