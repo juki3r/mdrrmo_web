@@ -6,6 +6,23 @@ export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+
+  const check_creds = () => {
+    if(token && user){
+      navigate("/dashboard")
+    }else{
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+    }
+  }
+
+  useEffect(()=>{
+    check_creds();
+  });
+
   const [form, setForm] = useState({
     fullname: "",
     province: "",
