@@ -4,15 +4,17 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "routes":[
-    {
-      "src" : "/(.*)",
-      "dest": "main.ts",
-      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-      "headers":{
-        "Access-Control-Allow-Origin": "*"
-      }
-    }
   ]
+
 }
+
+  // "routes":[
+  //   {
+  //     "src" : "/(.*)",
+  //     "dest": "main.ts",
+  //     "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  //     "headers":{
+  //       "Access-Control-Allow-Origin": "*"
+  //     }
+  //   }
+  // ]
