@@ -229,6 +229,9 @@ export default function Dashboard() {
                     <small style={{ color: "#6b7280" }}>
                       📍 {i.location}
                     </small>
+                    <small style={{ color: "#6b7280" }}>
+                      {i.description}
+                    </small>
 
                     {/* TIME */}
                     <div style={{ fontSize: "11px", color: "#9ca3af" }}>
