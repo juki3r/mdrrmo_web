@@ -133,7 +133,8 @@ export default function Dashboard() {
       hideFor: ["mdrrmo_admin"],
     },
     
-    { label: "Ordinances", value: formatNumber(stats.ordinances), icon: <FaBalanceScale /> },
+  
+    { label: "App Users", value: formatNumber(stats.app_users), icon: <FaMobileAlt /> },
     { label: "Incidents", value: formatNumber(stats.incidents), icon: <FaExclamationTriangle /> },
   ];
 
