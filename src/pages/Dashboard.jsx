@@ -103,15 +103,15 @@ export default function Dashboard() {
   // ================= CARDS =================
   const cards = [
     { label: "Residents", value: formatNumber(stats.residents), icon: <FaUsers /> },
-    { label: "Voters", value: stats.voters, icon: <FaIdCard /> },
-    { label: "Male", value: stats.male, icon: <FaMale /> },
-    { label: "Female", value: stats.female, icon: <FaFemale /> },
-    { label: "Blotters", value: stats.blotters, icon: <FaFileAlt /> },
-    { label: "Concerns", value: stats.concerns, icon: <FaClipboardList /> },
-    { label: "Certificates", value: stats.certificates, icon: <FaIdCard /> },
-    { label: "App Users", value: stats.app_users, icon: <FaMobileAlt /> },
-    { label: "Ordinances", value: stats.ordinances, icon: <FaBalanceScale /> },
-    { label: "Incidents", value: stats.incidents, icon: <FaExclamationTriangle /> },
+    { label: "Voters", value: formatNumber(stats.voters), icon: <FaIdCard /> },
+    { label: "Male", value: formatNumber(stats.male), icon: <FaMale /> },
+    { label: "Female", value: formatNumber(stats.female), icon: <FaFemale /> },
+    { label: "Blotters", value: formatNumber(stats.blotters), icon: <FaFileAlt /> },
+    { label: "Concerns", value: formatNumber(stats.concerns), icon: <FaClipboardList /> },
+    { label: "Certificates", value: formatNumber(stats.certificates), icon: <FaIdCard /> },
+    { label: "App Users", value: formatNumber(stats.app_users), icon: <FaMobileAlt /> },
+    { label: "Ordinances", value: formatNumber(stats.ordinances), icon: <FaBalanceScale /> },
+    { label: "Incidents", value: formatNumber(stats.incidents), icon: <FaExclamationTriangle /> },
   ];
 
   return (
