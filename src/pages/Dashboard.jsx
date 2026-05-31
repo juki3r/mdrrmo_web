@@ -112,10 +112,27 @@ export default function Dashboard() {
       icon: <FaFileAlt />,
       hideFor: ["mdrrmo_admin"],
     },
+    {
+      label: "Concerns",
+      value: formatNumber(stats.concerns),
+      icon: <FaFileAlt />,
+      hideFor: ["mdrrmo_admin"],
+    },
+
+    {
+      label: "Certificates",
+      value: formatNumber(stats.certificates),
+      icon: <FaFileAlt />,
+      hideFor: ["mdrrmo_admin"],
+    },
+
+    {
+      label: "Ordinances",
+      value: formatNumber(stats.ordinances),
+      icon: <FaFileAlt />,
+      hideFor: ["mdrrmo_admin"],
+    },
     
-    { label: "Concerns", value: formatNumber(stats.concerns), icon: <FaClipboardList /> },
-    { label: "Certificates", value: formatNumber(stats.certificates), icon: <FaIdCard /> },
-    { label: "App Users", value: formatNumber(stats.app_users), icon: <FaMobileAlt /> },
     { label: "Ordinances", value: formatNumber(stats.ordinances), icon: <FaBalanceScale /> },
     { label: "Incidents", value: formatNumber(stats.incidents), icon: <FaExclamationTriangle /> },
   ];
