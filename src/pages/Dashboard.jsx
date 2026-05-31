@@ -221,17 +221,18 @@ export default function Dashboard() {
                   {getIncidentIcon(i.type)}
 
                   {/* CONTENT */}
-                  <div style={{ flex: 1, flexDirection:"column" }}>
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: "700", fontSize: "13px" }}>
                       {i.type}
                     </div>
-
-                    <small style={{ color: "#6b7280" }}>
-                      📍 {i.location}
-                    </small>
-                    <small style={{ color: "#6b7280" }}>
-                      {i.description}
-                    </small>
+                    <div style={{flex:1, flexDirection:"column"}}>
+                      <small style={{ color: "#6b7280" }}>
+                        📍 {i.location}
+                      </small>
+                      <small style={{ color: "#6b7280" }}>
+                        {i.description}
+                      </small>
+                    </div>
 
                     {/* TIME */}
                     <div style={{ fontSize: "11px", color: "#9ca3af" }}>
