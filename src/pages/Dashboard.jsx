@@ -145,15 +145,15 @@ export default function Dashboard() {
       {/* KPI CARDS */}
       <div style={styles.grid}>
         {cards.filter(card => !card.hideFor?.includes(role))
-        .map((c, i) => (
-          <div key={i} style={styles.card}>
-            <div style={styles.icon}>{c.icon}</div>
-            <div>
-              <div style={styles.label}>{c.label}</div>
-              <div style={styles.value}>{c.value || 0}</div>
+          .map((c, i) => (
+            <div key={i} style={styles.card}>
+              <div style={styles.icon}>{c.icon}</div>
+              <div>
+                <div style={styles.label}>{c.label}</div>
+                <div style={styles.value}>{c.value || 0}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* MAIN GRID */}

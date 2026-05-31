@@ -74,7 +74,7 @@ export default function Layout() {
       ]
     : [
         { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-        { name: "Alerts", path: "/alerts", icon: Bell },
+        { name: "News & Alerts", path: "/alerts", icon: Bell },
         { name: "Incidents", path: "/incidents", icon: AlertTriangle },
         { name: "Operations", path: "/operations", icon: Truck },
         { name: "Barangays", path: "/barangays", icon: Home },
