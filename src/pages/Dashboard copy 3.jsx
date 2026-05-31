@@ -41,8 +41,6 @@ export default function Dashboard() {
   const [genderData, setGenderData] = useState([]);
   const [ageData, setAgeData] = useState([]);
   const [liveIncidents, setLiveIncidents] = useState([]);
-  const [role, setRole] = useState("");
-  
 
   const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
 
@@ -59,7 +57,6 @@ export default function Dashboard() {
       const data = await res.json();
 
       setStats(data);
-      setRole(data.role);
       setIncidentTrend(data.incident_trend || []);
       setGenderData(data.gender_distribution || []);
       setAgeData(data.age_distribution || []);
@@ -120,19 +117,14 @@ export default function Dashboard() {
       {/* HEADER */}
       <div style={styles.header}>
         <div>
-          <h2>
-            {role === "mdrrmo_admin"
-              ? "Municipal Operations Dashboard"
-              : "Barangay Operations Dashboard"}
-          </h2>
+          <h2 style={styles.title}>Barangay Operations Dashboard</h2>
           <p style={styles.subtitle}>
             Real-time monitoring of community safety and services
           </p>
         </div>
 
         <div style={styles.liveBadge}>
-          <FaBell />
-          {role === "mdrrmo_admin" ? "MUNICIPAL VIEW" : "BARANGAY VIEW"}
+          <FaBell /> LIVE MONITORING
         </div>
       </div>
 
