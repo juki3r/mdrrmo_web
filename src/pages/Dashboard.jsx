@@ -41,8 +41,18 @@ export default function Dashboard() {
   const [genderData, setGenderData] = useState([]);
   const [ageData, setAgeData] = useState([]);
   const [liveIncidents, setLiveIncidents] = useState([]);
-  const [role, setRole] = useState("");
-  
+
+
+  const getUser = () => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || {};
+    } catch {
+      return {};
+    }
+  };
+
+  const user = getUser();
+  const role = user?.role;
 
   const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444"];
 
@@ -59,7 +69,6 @@ export default function Dashboard() {
       const data = await res.json();
 
       setStats(data);
-      setRole(data.role);
       setIncidentTrend(data.incident_trend || []);
       setGenderData(data.gender_distribution || []);
       setAgeData(data.age_distribution || []);
