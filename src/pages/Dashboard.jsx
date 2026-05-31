@@ -221,7 +221,7 @@ export default function Dashboard() {
                   {getIncidentIcon(i.type)}
 
                   {/* CONTENT */}
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, flexDirection:"column" }}>
                     <div style={{ fontWeight: "700", fontSize: "13px" }}>
                       {i.type}
                     </div>
