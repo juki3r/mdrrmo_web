@@ -225,10 +225,12 @@ export default function Dashboard() {
                     <div style={{ fontWeight: "700", fontSize: "13px" }}>
                       {i.type}
                     </div>
-                    <div style={{flex:1, flexDirection:"column"}}>
+                    <div>
                       <small style={{ color: "#6b7280" }}>
                         📍 {i.location}
                       </small>
+                      </div>
+                      <div>
                       <small style={{ color: "#6b7280" }}>
                         {i.description}
                       </small>
