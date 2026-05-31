@@ -656,6 +656,244 @@ export default function Blotter() {
         </div>
       </div>
     )}
+
+    {/* ================= CREATE BLOTTER MODAL ================= */}
+    {showModal && (
+      <div
+        className="modal d-block"
+        style={{ background: "rgba(0,0,0,0.5)" }}
+      >
+        <div className="modal-dialog modal-xl modal-dialog-scrollable">
+          <div className="modal-content">
+
+            {/* HEADER */}
+            <div className="modal-header">
+              <h5 className="modal-title">Create Blotter Record</h5>
+
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowModal(false)}
+              />
+            </div>
+
+            {/* FORM */}
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+
+                <div className="row g-3">
+
+                  {/* INCIDENT DETAILS */}
+                  <div className="col-12">
+                    <h6 className="fw-bold border-bottom pb-2">
+                      Incident Information
+                    </h6>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Incident Type</label>
+                    <input
+                      type="text"
+                      name="incident_type"
+                      className="form-control"
+                      value={form.incident_type}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Category</label>
+                    <input
+                      type="text"
+                      name="incident_category"
+                      className="form-control"
+                      value={form.incident_category}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Incident Date</label>
+                    <input
+                      type="date"
+                      name="incident_date"
+                      className="form-control"
+                      value={form.incident_date}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Incident Time</label>
+                    <input
+                      type="time"
+                      name="incident_time"
+                      className="form-control"
+                      value={form.incident_time}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label">Location</label>
+                    <input
+                      type="text"
+                      name="incident_location"
+                      className="form-control"
+                      value={form.incident_location}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label">Incident Details</label>
+                    <textarea
+                      rows="4"
+                      name="incident_details"
+                      className="form-control"
+                      value={form.incident_details}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* COMPLAINANT */}
+                  <div className="col-12 mt-3">
+                    <h6 className="fw-bold border-bottom pb-2">
+                      Complainant Information
+                    </h6>
+                  </div>
+
+                  <div className="col-md-4">
+                    <label className="form-label">Name</label>
+                    <input
+                      type="text"
+                      name="complainant_name"
+                      className="form-control"
+                      value={form.complainant_name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <label className="form-label">Contact Number</label>
+                    <input
+                      type="text"
+                      name="complainant_contact"
+                      className="form-control"
+                      value={form.complainant_contact}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <label className="form-label">Address</label>
+                    <input
+                      type="text"
+                      name="complainant_address"
+                      className="form-control"
+                      value={form.complainant_address}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* RESPONDENT */}
+                  <div className="col-12 mt-3">
+                    <h6 className="fw-bold border-bottom pb-2">
+                      Respondent Information
+                    </h6>
+                  </div>
+
+                  <div className="col-md-4">
+                    <label className="form-label">Name</label>
+                    <input
+                      type="text"
+                      name="respondent_name"
+                      className="form-control"
+                      value={form.respondent_name}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <label className="form-label">Contact Number</label>
+                    <input
+                      type="text"
+                      name="respondent_contact"
+                      className="form-control"
+                      value={form.respondent_contact}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <label className="form-label">Address</label>
+                    <input
+                      type="text"
+                      name="respondent_address"
+                      className="form-control"
+                      value={form.respondent_address}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* WITNESS */}
+                  <div className="col-12 mt-3">
+                    <h6 className="fw-bold border-bottom pb-2">
+                      Witness Information
+                    </h6>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Witness Name</label>
+                    <input
+                      type="text"
+                      name="witness_name"
+                      className="form-control"
+                      value={form.witness_name}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Witness Contact</label>
+                    <input
+                      type="text"
+                      name="witness_contact"
+                      className="form-control"
+                      value={form.witness_contact}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                </div>
+              </div>
+
+              {/* FOOTER */}
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button type="submit" className="btn btn-primary">
+                  Save Blotter
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    )}
   </div>
 );
 }
