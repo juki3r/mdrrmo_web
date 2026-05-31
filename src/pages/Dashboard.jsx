@@ -106,7 +106,13 @@ export default function Dashboard() {
     { label: "Voters", value: formatNumber(stats.voters), icon: <FaIdCard /> },
     { label: "Male", value: formatNumber(stats.male), icon: <FaMale /> },
     { label: "Female", value: formatNumber(stats.female), icon: <FaFemale /> },
-    { label: "Blotters", value: formatNumber(stats.blotters), icon: <FaFileAlt /> },
+    {
+      label: "Blotters",
+      value: formatNumber(stats.blotters),
+      icon: <FaFileAlt />,
+      hideFor: ["mdrrmo_admin"],
+    },
+    
     { label: "Concerns", value: formatNumber(stats.concerns), icon: <FaClipboardList /> },
     { label: "Certificates", value: formatNumber(stats.certificates), icon: <FaIdCard /> },
     { label: "App Users", value: formatNumber(stats.app_users), icon: <FaMobileAlt /> },
