@@ -59,6 +59,7 @@ export default function Dashboard() {
 
       setStats(data);
       setRole(data.role);
+      console.log(data.role);
       setIncidentTrend(data.incident_trend || []);
       setGenderData(data.gender_distribution || []);
       setAgeData(data.age_distribution || []);
