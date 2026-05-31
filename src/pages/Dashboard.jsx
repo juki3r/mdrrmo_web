@@ -226,12 +226,12 @@ export default function Dashboard() {
                       {i.type}
                     </div>
                     <div>
-                      <small style={{ color: "#6b7280" }}>
+                      <small style={{ color: "#6b7280", fontSize:12 }}>
                         📍 {i.location}
                       </small>
                       </div>
                       <div>
-                      <small style={{ color: "#6b7280" }}>
+                      <small style={{ color: "#6b7280", fontSize:11 }}>
                         {i.description}
                       </small>
                     </div>
