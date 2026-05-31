@@ -167,6 +167,7 @@ export default function Blotter() {
   // DELETE
   // =========================
   const handleDelete = async (id) => {
+
     if (!confirm("Delete this blotter?")) return;
 
     try {
@@ -408,7 +409,7 @@ export default function Blotter() {
                         </span>
                       </td>
 
-                      <td className="text-end">
+                      <td className="text-end" onClick={(e) => e.stopPropagation()}>
 
                         <button
                           className="btn btn-sm btn-outline-warning me-2"
@@ -446,7 +447,7 @@ export default function Blotter() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="10" className="text-center py-5">
+                    <td colSpan="11" className="text-center py-5">
                       No blotters found
                     </td>
                   </tr>
@@ -659,241 +660,252 @@ export default function Blotter() {
 
     {/* ================= CREATE BLOTTER MODAL ================= */}
     {showModal && (
-      <div
-        className="modal d-block"
-        style={{ background: "rgba(0,0,0,0.5)" }}
-      >
-        <div className="modal-dialog modal-xl modal-dialog-scrollable">
-          <div className="modal-content">
+        <div className="modal d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg" >
+            <div className="modal-content rounded-4 shadow">
 
-            {/* HEADER */}
-            <div className="modal-header">
-              <h5 className="modal-title">Create Blotter Record</h5>
+              {/* HEADER */}
+              <div className="modal-header border-0">
+                <div>
+                  <h5 className="fw-bold mb-0">Add Blotter Record</h5>
+                  <small className="text-muted">
+                    Fields marked with <span className="text-danger">*</span> are required
+                  </small>
+                </div>
 
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setShowModal(false)}
-              />
-            </div>
+                <button className="btn-close" onClick={() => setShowModal(false)} />
+              </div>
 
-            {/* FORM */}
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
+              <form onSubmit={handleSubmit}>
+                <div className="modal-body">
 
-                <div className="row g-3">
+                  {/* ================= INCIDENT INFO ================= */}
+                  <div className="mb-3">
+                    <h6 className="fw-semibold text-primary">Incident Information</h6>
+                    <hr />
 
-                  {/* INCIDENT DETAILS */}
-                  <div className="col-12">
-                    <h6 className="fw-bold border-bottom pb-2">
-                      Incident Information
-                    </h6>
+                    <div className="row g-3">
+
+                      {/* INCIDENT TYPE */}
+                      <div className="col-md-6">
+                        <label className="form-label">
+                          Incident Type <span className="text-danger">*</span>
+                        </label>
+
+                        <select
+                          name="incident_type"
+                          className="form-control form-select border-primary"
+                          value={form.incident_type}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select incident type</option>
+                          <option>Theft</option>
+                          <option>Assault</option>
+                          <option>Domestic Violence</option>
+                          <option>Alarm and Scandal</option>
+                          <option>Property Damage</option>
+                          <option>Threat</option>
+                          <option>Missing Person</option>
+                          <option>Fire Incident</option>
+                          <option>Disaster Incident</option>
+                          <option>Others</option>
+                        </select>
+                      </div>
+
+
+                      {/* DATE */}
+                      <div className="col-md-3">
+                        <label className="form-label">
+                          Date <span className="text-danger">*</span>
+                        </label>
+
+                        <input
+                          type="date"
+                          name="incident_date"
+                          className="form-control border-primary"
+                          value={form.incident_date}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      {/* TIME */}
+                      <div className="col-md-3">
+                        <label className="form-label">Time</label>
+                        <input
+                          type="time"
+                          name="incident_time"
+                          className="form-control"
+                          value={form.incident_time}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* LOCATION */}
+                      <div className="col-6">
+                        <label className="form-label">
+                          Location <span className="text-danger">*</span>
+                        </label>
+
+                        <input
+                          name="incident_location"
+                          className="form-control border-primary"
+                          placeholder="Exact incident location"
+                          value={form.incident_location}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      {/* STATUS */}
+                      <div className="col-md-3">
+                        <label className="form-label">Status</label>
+                        <select
+                          name="status"
+                          className="form-control"
+                          value={form.status || "Pending"}
+                          onChange={handleChange}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Ongoing">Ongoing</option>
+                          <option value="Resolved">Resolved</option>
+                          <option value="Dismissed">Dismissed</option>
+                        </select>
+                      </div>
+
+                      {/* PRIORITY */}
+                      <div className="col-md-3">
+                        <label className="form-label">Priority Level</label>
+                        <select
+                          name="priority_level"
+                          className="form-control"
+                          value={form.priority_level || "Medium"}
+                          onChange={handleChange}
+                        >
+                          <option value="Low">Low</option>
+                          <option value="Medium">Medium</option>
+                          <option value="High">High</option>
+                          <option value="Critical">Critical</option>
+                        </select>
+                      </div>
+
+                      {/* DETAILS */}
+                      <div className="col-12">
+                        <label className="form-label">
+                          Incident Details <span className="text-danger">*</span>
+                        </label>
+
+                        <textarea
+                          name="incident_details"
+                          className="form-control border-primary"
+                          placeholder="Describe what happened..."
+                          value={form.incident_details}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                    </div>
                   </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Incident Type</label>
-                    <input
-                      type="text"
-                      name="incident_type"
-                      className="form-control"
-                      value={form.incident_type}
-                      onChange={handleChange}
-                      required
-                    />
+                  {/* ================= PEOPLE ================= */}
+                  <div className="mb-3">
+                    <h6 className="fw-semibold text-primary">People Involved</h6>
+                    <hr />
+
+                    <div className="row g-3">
+
+                      {/* COMPLAINANT */}
+                      <div className="col-md-6">
+                        <label className="form-label">
+                          Complainant <span className="text-danger">*</span>
+                        </label>
+
+                        <input
+                          name="complainant_name"
+                          className="form-control border-primary"
+                          placeholder="Full name"
+                          value={form.complainant_name}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label">Contact</label>
+                        <input
+                          type="number"
+                          name="complainant_contact"
+                          className="form-control"
+                          placeholder="Optional"
+                          value={form.complainant_contact}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      {/* RESPONDENT */}
+                      <div className="col-md-6">
+                        <label className="form-label">Respondent</label>
+                        <input
+                          name="respondent_name"
+                          className="form-control"
+                          placeholder="Optional"
+                          value={form.respondent_name}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label">Contact</label>
+                        <input
+                          name="respondent_contact"
+                          className="form-control"
+                          placeholder="Optional"
+                          value={form.respondent_contact}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                    </div>
                   </div>
 
-                  <div className="col-md-6">
-                    <label className="form-label">Category</label>
-                    <input
-                      type="text"
-                      name="incident_category"
-                      className="form-control"
-                      value={form.incident_category}
-                      onChange={handleChange}
-                    />
-                  </div>
+                  {/* ================= CLASSIFICATION ================= */}
+                  <div>
+                    <h6 className="fw-semibold text-primary">Classification</h6>
+                    <hr />
 
-                  <div className="col-md-6">
-                    <label className="form-label">Incident Date</label>
-                    <input
-                      type="date"
-                      name="incident_date"
-                      className="form-control"
-                      value={form.incident_date}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                    <div className="row g-3">
 
-                  <div className="col-md-6">
-                    <label className="form-label">Incident Time</label>
-                    <input
-                      type="time"
-                      name="incident_time"
-                      className="form-control"
-                      value={form.incident_time}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                      
 
-                  <div className="col-12">
-                    <label className="form-label">Location</label>
-                    <input
-                      type="text"
-                      name="incident_location"
-                      className="form-control"
-                      value={form.incident_location}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="col-12">
-                    <label className="form-label">Incident Details</label>
-                    <textarea
-                      rows="4"
-                      name="incident_details"
-                      className="form-control"
-                      value={form.incident_details}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* COMPLAINANT */}
-                  <div className="col-12 mt-3">
-                    <h6 className="fw-bold border-bottom pb-2">
-                      Complainant Information
-                    </h6>
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="form-label">Name</label>
-                    <input
-                      type="text"
-                      name="complainant_name"
-                      className="form-control"
-                      value={form.complainant_name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="form-label">Contact Number</label>
-                    <input
-                      type="text"
-                      name="complainant_contact"
-                      className="form-control"
-                      value={form.complainant_contact}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="form-label">Address</label>
-                    <input
-                      type="text"
-                      name="complainant_address"
-                      className="form-control"
-                      value={form.complainant_address}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  {/* RESPONDENT */}
-                  <div className="col-12 mt-3">
-                    <h6 className="fw-bold border-bottom pb-2">
-                      Respondent Information
-                    </h6>
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="form-label">Name</label>
-                    <input
-                      type="text"
-                      name="respondent_name"
-                      className="form-control"
-                      value={form.respondent_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="form-label">Contact Number</label>
-                    <input
-                      type="text"
-                      name="respondent_contact"
-                      className="form-control"
-                      value={form.respondent_contact}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="form-label">Address</label>
-                    <input
-                      type="text"
-                      name="respondent_address"
-                      className="form-control"
-                      value={form.respondent_address}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  {/* WITNESS */}
-                  <div className="col-12 mt-3">
-                    <h6 className="fw-bold border-bottom pb-2">
-                      Witness Information
-                    </h6>
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Witness Name</label>
-                    <input
-                      type="text"
-                      name="witness_name"
-                      className="form-control"
-                      value={form.witness_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Witness Contact</label>
-                    <input
-                      type="text"
-                      name="witness_contact"
-                      className="form-control"
-                      value={form.witness_contact}
-                      onChange={handleChange}
-                    />
+                    </div>
                   </div>
 
                 </div>
-              </div>
 
-              {/* FOOTER */}
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
+                {/* FOOTER */}
+                <div className="modal-footer border-0">
+                  <button
+                    type="button"
+                    className="btn btn-light"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
 
-                <button type="submit" className="btn btn-primary">
-                  Save Blotter
-                </button>
-              </div>
-            </form>
+                  <button type="submit" className="btn btn-primary px-4">
+                    Save Blotter
+                  </button>
+                </div>
 
+              </form>
+
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
   </div>
 );
 }
