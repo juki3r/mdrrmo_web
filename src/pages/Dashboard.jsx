@@ -98,10 +98,11 @@ export default function Dashboard() {
         return <FaExclamationTriangle color="#f59e0b" />;
     }
   };
+  const formatNumber = (num) => Number(num || 0).toLocaleString();
 
   // ================= CARDS =================
   const cards = [
-    { label: "Residents", value: stats.residents, icon: <FaUsers /> },
+    { label: "Residents", value: formatNumber(stats.residents), icon: <FaUsers /> },
     { label: "Voters", value: stats.voters, icon: <FaIdCard /> },
     { label: "Male", value: stats.male, icon: <FaMale /> },
     { label: "Female", value: stats.female, icon: <FaFemale /> },
