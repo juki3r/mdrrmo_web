@@ -399,7 +399,7 @@ export default function Incidents() {
                         <td>{toProperCase(i.reported_by)}</td>
                         <td>{toProperCase(formatMobile(i.contact_number))}</td>
                         <td>{i.gps_location || "-"}</td>
-                        <td className="text-end">
+                        <td className="d-flex justify-content-center align-items-center gap-2">
 
                           <button
                             className="btn btn-sm btn-outline-warning me-2"
