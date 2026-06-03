@@ -321,7 +321,7 @@ export default function Dashboard() {
                 style={{ height: "100%", width: "100%" }}
               >
                 <TileLayer
-                  attribution='&copy; OpenStreetMap contributors'
+                  attribution='&copy; PONG-MTA I.T Services'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
