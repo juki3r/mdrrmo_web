@@ -341,7 +341,7 @@ export default function News() {
                           <option value="">Select Category</option>
                           <option value="General">General</option>
                           <option value="Health">Health</option>
-                          <option value="Meeting">Disaster Prep</option>
+                          <option value="Disaster Prep">Disaster Prep</option>
                           <option value="Meeting">Meeting</option>
                           <option value="Event">Event</option>
                           
