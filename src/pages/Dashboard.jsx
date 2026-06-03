@@ -322,7 +322,6 @@ export default function Dashboard() {
               >
                 <TileLayer
                   attribution='&copy; PONG-MTA I.T Services'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
                 {liveIncidents.map((incident) => {
