@@ -402,7 +402,7 @@ export default function Incidents() {
                         <td className="d-flex justify-content-center align-items-center gap-2">
 
                           <button
-                            className="btn btn-sm btn-outline-warning me-2"
+                            className="btn btn-sm btn-outline-warning me-2 d-flex align-items-center"
                             onClick={(e) => {
                               e.stopPropagation();
 
@@ -418,7 +418,7 @@ export default function Incidents() {
                           </button>
 
                           <button
-                            className="btn btn-sm btn-outline-primary me-2"
+                            className="btn btn-sm btn-outline-primary me-2 d-flex align-items-center"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedIncident(i);
@@ -429,7 +429,7 @@ export default function Incidents() {
                           </button>
 
                           <button
-                            className="btn btn-sm btn-outline-danger"
+                            className="btn btn-sm btn-outline-danger d-flex align-items-center"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(i.id);
