@@ -399,44 +399,45 @@ export default function Incidents() {
                         <td>{toProperCase(i.reported_by)}</td>
                         <td>{toProperCase(formatMobile(i.contact_number))}</td>
                         <td>{i.gps_location || "-"}</td>
-                        <td className="d-flex justify-content-center align-items-center gap-2">
+                        <td className="">
+                          <div className="d-flex justify-content-center align-items-center gap-2">
+                            <button
+                              className="btn btn-sm btn-outline-warning me-2 d-flex align-items-center"
+                              onClick={(e) => {
+                                e.stopPropagation();
 
-                          <button
-                            className="btn btn-sm btn-outline-warning me-2 d-flex align-items-center"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                                setEditForm({
+                                  id: i.id,
+                                  status: i.status || "",
+                                });
 
-                              setEditForm({
-                                id: i.id,
-                                status: i.status || "",
-                              });
+                                setShowStatusModal(true);
+                              }}
+                            >
+                              Status
+                            </button>
 
-                              setShowStatusModal(true);
-                            }}
-                          >
-                            Status
-                          </button>
+                            <button
+                              className="btn btn-sm btn-outline-primary me-2 d-flex align-items-center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedIncident(i);
+                                setShowViewModal(true);
+                              }}
+                            >
+                              View
+                            </button>
 
-                          <button
-                            className="btn btn-sm btn-outline-primary me-2 d-flex align-items-center"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedIncident(i);
-                              setShowViewModal(true);
-                            }}
-                          >
-                            View
-                          </button>
-
-                          <button
-                            className="btn btn-sm btn-outline-danger d-flex align-items-center"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(i.id);
-                            }}
-                          >
-                            Delete
-                          </button>
+                            <button
+                              className="btn btn-sm btn-outline-danger d-flex align-items-center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(i.id);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
 
                         </td>
                       </tr>
