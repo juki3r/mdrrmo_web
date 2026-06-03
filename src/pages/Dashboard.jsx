@@ -230,6 +230,25 @@ export default function Dashboard() {
                         📍 {i.location}
                       </small>
                       </div>
+                      {i.gps_location && (
+                        <div>
+                          <small
+                            style={{
+                              color: "#2563eb",
+                              fontSize: 11,
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              window.open(
+                                `https://maps.google.com/?q=${i.gps_location}`,
+                                "_blank"
+                              )
+                            }
+                          >
+                            🛰️ {i.gps_location}
+                          </small>
+                        </div>
+                      )}
                       <div>
                       <small style={{ color: "#6b7280", fontSize:11 }}>
                         {i.description}
