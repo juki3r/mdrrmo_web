@@ -48,6 +48,8 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+
+
 export default function Dashboard() {
   const token = localStorage.getItem("token");
 
@@ -152,6 +154,25 @@ export default function Dashboard() {
     { label: "App Users", value: formatNumber(stats.app_users), icon: <FaMobileAlt /> },
     { label: "Incidents", value: formatNumber(stats.incidents), icon: <FaExclamationTriangle /> },
   ];
+
+  const getMarkerColor = type => {
+      switch (type) {
+        case "Fire":
+          return redIcon;
+
+        case "Flood":
+          return blueIcon;
+
+        case "Medical":
+          return greenIcon;
+
+        case "Accident":
+          return orangeIcon;
+
+        default:
+          return redIcon;
+      }
+    };
 
   return (
     <div style={styles.container}>
@@ -337,6 +358,7 @@ export default function Dashboard() {
                     <Marker
                       key={incident.id}
                       position={[lat, lng]}
+                      icon={getMarkerColor(incident.type)}
                     >
                       <Popup>
                         <strong>{incident.type}</strong>
