@@ -317,7 +317,7 @@ export default function Dashboard() {
             <div style={{ height: 400, borderRadius: 12, overflow: "hidden" }}>
               <MapContainer
                 center={[11.52650713035669, 123.23823962066035]}
-                zoom={6}
+                zoom={10}
                 style={{ height: "100%", width: "100%" }}
               >
                 <TileLayer
