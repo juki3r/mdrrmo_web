@@ -612,6 +612,13 @@ export default function Incidents() {
               </div>
 
               <div className="mb-3">
+                <label className="text-muted small">Possible GPS Location</label>
+                <div className="border rounded p-2 bg-white">
+                  {selectedIncident.gps_location || "N/A"}
+                </div>
+              </div>
+
+              <div className="mb-3">
                 <label className="text-muted small">Description</label>
                 <div className="border rounded p-2 bg-white">
                   {selectedIncident.description}
