@@ -352,7 +352,7 @@ export default function Dashboard() {
                     <Marker
                       key={incident.id}
                       position={[lat, lng]}
-                      icon={getMarkerColor(incident.type)}
+                      icon={getMarkerIcon(incident.type)}
                     >
                       <Popup>
                         <strong>{incident.type}</strong>
