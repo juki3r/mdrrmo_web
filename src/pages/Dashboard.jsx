@@ -373,7 +373,7 @@ export default function Dashboard() {
         <div style={styles.fullBox}>
             <h3>📍 Live Incident Map</h3>
 
-            <div style={{ height: 400, borderRadius: 12, overflow: "hidden" }}>
+            <div style={{ height: 500, borderRadius: 12, overflow: "hidden" }}>
               <MapContainer
                 center={[11.52650713035669, 123.23823962066035]}
                 zoom={11}
