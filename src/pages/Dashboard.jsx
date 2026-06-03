@@ -166,24 +166,7 @@ export default function Dashboard() {
     shadowSize: [41, 41],
   });
 
-  const getMarkerColor = type => {
-      switch (type) {
-        case "Fire":
-          return redIcon;
-
-        case "Flood":
-          return blueIcon;
-
-        case "Medical":
-          return greenIcon;
-
-        case "Accident":
-          return orangeIcon;
-
-        default:
-          return redIcon;
-      }
-    };
+  const getMarkerIcon = () => redIcon;
 
   return (
     <div style={styles.container}>
