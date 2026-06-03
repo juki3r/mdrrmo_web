@@ -365,6 +365,7 @@ export default function Incidents() {
                     <th>Status</th>
                     <th>Reported By</th>
                     <th>Mobile Number</th>
+                    <th>Possible GPS</th>
                     <th className="text-end">Actions</th>
                   </tr>
                 </thead>
@@ -397,7 +398,7 @@ export default function Incidents() {
                         <td>{getStatusBadge(i.status)}</td>
                         <td>{toProperCase(i.reported_by)}</td>
                         <td>{toProperCase(formatMobile(i.contact_number))}</td>
-
+                        <td>{i.possible_gps || "-"}</td>
                         <td className="text-end">
 
                           <button
