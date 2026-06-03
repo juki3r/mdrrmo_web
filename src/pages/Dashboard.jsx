@@ -32,6 +32,8 @@ import {
   FaHeartbeat,
   FaShieldAlt,
 } from "react-icons/fa";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function Dashboard() {
   const token = localStorage.getItem("token");
@@ -297,13 +299,44 @@ export default function Dashboard() {
 
         {/* MAP PANEL (placeholder for Leaflet/Google Maps) */}
         <div style={styles.fullBox}>
-          <h3>📍 Incident Map (Ready for Integration)</h3>
+            <h3>📍 Live Incident Map</h3>
 
-          <div style={styles.mapPlaceholder}>
-            <FaMapMarkedAlt size={40} />
-            <p>Map visualization will appear here (Leaflet / Google Maps)</p>
+            <div style={{ height: 400, borderRadius: 12, overflow: "hidden" }}>
+              <MapContainer
+                center={[11.596377, 123.149881]}
+                zoom={12}
+                style={{ height: "100%", width: "100%" }}
+              >
+                <TileLayer
+                  attribution='&copy; OpenStreetMap contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                {liveIncidents.map((incident) => {
+                  if (!incident.gps_location) return null;
+
+                  const [lat, lng] = incident.gps_location
+                    .split(",")
+                    .map(Number);
+
+                  return (
+                    <Marker
+                      key={incident.id}
+                      position={[lat, lng]}
+                    >
+                      <Popup>
+                        <strong>{incident.type}</strong>
+                        <br />
+                        {incident.location}
+                        <br />
+                        {incident.description}
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
+            </div>
           </div>
-        </div>
 
         {/* GENDER */}
         <div style={styles.box}>
