@@ -414,7 +414,7 @@ export default function Incidents() {
                               setShowStatusModal(true);
                             }}
                           >
-                            Edit Status
+                            Status
                           </button>
 
                           <button
