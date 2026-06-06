@@ -39,6 +39,7 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/news" element={<News />} />
           <Route path="/incidents" element={<Incidents />} />
+          <Route path="/evacuation-centers" element={<EvacuationCenters />} />
         </Route>
       </Route>
 
@@ -56,7 +57,6 @@ export default function AppRoutes() {
             <Route path="/ordinance" element={<Ordinance />} />
             <Route path="/officials" element={<Officials />} />
             <Route path="/events" element={<EventsCalendar />} />
-            <Route path="/evacuation-centers" element={<EvacuationCenters />} />
             <Route path="/appusers" element={<AppUsers />} />
           </Route>
         </Route>
