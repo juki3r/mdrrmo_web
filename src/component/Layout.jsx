@@ -76,6 +76,7 @@ export default function Layout() {
         { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
         { name: "News & Alerts", path: "/news", icon: NotebookText },
         { name: "Incidents", path: "/incidents", icon: AlertTriangle },
+        { name: "Evacuation Centers", path: "/evacuation-centers", icon: HousePlus },
         { name: "Operations", path: "/operations", icon: Truck },
         { name: "Barangays", path: "/barangays", icon: Home },
         { name: "Reports", path: "/reports", icon: FileText },
