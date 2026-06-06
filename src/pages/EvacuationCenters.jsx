@@ -284,8 +284,123 @@ export default function EvacuationCenters() {
     }
   };
 
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ================= MDRRMO VIEW =================
+  if (user?.role === "mdrrmo_admin") {
+
+    const totalOccupants = centers.reduce(
+      (sum, c) => sum + Number(c.current_occupancy || 0),
+      0
+    );
+
+    const totalCapacity = centers.reduce(
+      (sum, c) => sum + Number(c.capacity || 0),
+      0
+    );
+
+    return (
+      <div className="container-fluid p-4">
+
+        <div className="d-flex justify-content-between mb-4">
+          <div>
+            <h3>MDRRMO Evacuation Monitoring</h3>
+            <small className="text-muted">
+              Municipality-wide evacuation centers
+            </small>
+          </div>
+        </div>
+
+        <div className="row g-3 mb-4">
+
+          <div className="col-md-3">
+            <div className="card">
+              <div className="card-body">
+                <small>Total Centers</small>
+                <h3>{centers.length}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card">
+              <div className="card-body">
+                <small>Occupants</small>
+                <h3>{totalOccupants}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card">
+              <div className="card-body">
+                <small>Capacity</small>
+                <h3>{totalCapacity}</h3>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="card">
+
+          <div className="table-responsive">
+
+            <table className="table table-hover mb-0">
+
+              <thead>
+                <tr>
+                  <th>Barangay</th>
+                  <th>Center</th>
+                  <th>Location</th>
+                  <th>Occupancy</th>
+                  <th>Status</th>
+                  <th>Contact Person</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {centers.map((c) => (
+
+                  <tr key={c.id}>
+
+                    <td>{c.barangay}</td>
+
+                    <td>{c.name}</td>
+
+                    <td>{c.location}</td>
+
+                    <td>
+                      {c.current_occupancy || 0}
+                      /
+                      {c.capacity || 0}
+                    </td>
+
+                    <td>{c.status}</td>
+
+                    <td>{c.contact_person}</td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
   
   // ================= UI =================
+  // For Barangay Officials
   return (
     <div className="container-fluid p-4">
 
