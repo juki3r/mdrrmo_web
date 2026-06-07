@@ -412,9 +412,7 @@ const styles = {
 
   mapPanel: {
     background: "#fff",
-    bordertopLeftRadius: 0,
-    bordertopRightRadius: 0,
-    borderRadius: "12px",
+    // borderRadius: "12px",
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
