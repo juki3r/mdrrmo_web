@@ -361,7 +361,7 @@ const styles = {
   },
 
   header: {
-    height: "80px",
+    height: "60px",
     background: "#fff",
     borderRadius: "12px",
     padding: "15px 20px",
