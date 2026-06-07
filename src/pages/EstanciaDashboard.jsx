@@ -283,9 +283,17 @@ export default function EstanciaDashboard() {
                     </div>
 
                     <div style={styles.feedTime}>
-                      {new Date(
-                        incident.incident_datetime
-                      ).toLocaleString()}
+                      {new Date(incident.incident_datetime).toLocaleString(
+                        "en-PH",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        }
+                      )}
                     </div>
                   </div>
                 </div>
