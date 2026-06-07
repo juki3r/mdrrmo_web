@@ -332,7 +332,16 @@ export default function EstanciaDashboard() {
             <LineChart data={incidentTrend}>
               <CartesianGrid strokeDasharray="3 3" />
 
-              <XAxis dataKey="date" />
+              <XAxis
+                  dataKey="date"
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-PH", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                />
 
               <YAxis />
 
