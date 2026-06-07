@@ -351,7 +351,7 @@ export default function EstanciaDashboard() {
                 type="monotone"
                 dataKey="total"
                 stroke="#ef4444"
-                strokeWidth={4}
+                strokeWidth={2}
               />
             </LineChart>
           </ResponsiveContainer>
