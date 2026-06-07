@@ -488,7 +488,7 @@ const styles = {
   reporter: {
     fontSize: "11px",
     color: "#6b7280",
-    mtarginTop: "15px",
+    marginTop: "10px",
   },
 
   feedTime: {
