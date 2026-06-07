@@ -282,7 +282,7 @@ export default function EstanciaDashboard() {
                       {incident.description}
                     </div>
 
-                    <div style={styles.reporter}>
+                    <div style={styles.feedDesc2}>
                       Reported by: {incident.reported_by}
                        | Contact: {
                         incident.contact_number?.replace(
@@ -485,10 +485,10 @@ const styles = {
     color: "#6b7280",
   },
 
-  reporter: {
+  feedDesc2: {
     fontSize: "11px",
     color: "#6b7280",
-    marginTop: "10px !important",
+    marginTop: "10px",
   },
 
   feedTime: {
