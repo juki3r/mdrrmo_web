@@ -373,6 +373,8 @@ const styles = {
     height: "60px",
     background: "#fff",
     borderRadius: "12px",
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     padding: "15px 20px",
     display: "flex",
     justifyContent: "space-between",
