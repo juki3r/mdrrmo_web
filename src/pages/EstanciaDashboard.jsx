@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,16 +8,34 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+
 import {
   FaFire,
   FaWater,
   FaHeartbeat,
   FaShieldAlt,
   FaCarCrash,
+  FaExclamationTriangle,
   FaBell,
 } from "react-icons/fa";
+
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
 import "leaflet/dist/leaflet.css";
+
+import L from "leaflet";
+
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 export default function EstanciaDashboard() {
   const token = localStorage.getItem("token");
@@ -26,88 +43,189 @@ export default function EstanciaDashboard() {
   const [stats, setStats] = useState({});
   const [incidentTrend, setIncidentTrend] = useState([]);
   const [liveIncidents, setLiveIncidents] = useState([]);
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
 
   const fetchDashboard = async () => {
     try {
-      const res = await fetch("https://ajcpisonet.com/api/estancia-dashboard", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const res = await fetch(
+        "https://ajcpisonet.com/api/estancia-dashboard",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       const data = await res.json();
+
       setStats(data);
       setIncidentTrend(data.incident_trend || []);
       setLiveIncidents(data.live_incidents || []);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   useEffect(() => {
     fetchDashboard();
+
     const interval = setInterval(fetchDashboard, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
-  const cards = [
-    { label: "TOTAL", value: stats.incidents || 0, color: "#2563eb" },
-    { label: "ACTIVE", value: liveIncidents.length, color: "#ef4444" },
-    { label: "FIRE", value: stats.fire || 0, color: "#dc2626" },
-    { label: "FLOOD", value: stats.flood || 0, color: "#0284c7" },
-    { label: "MEDICAL", value: stats.medical || 0, color: "#16a34a" },
-    { label: "CRIME", value: stats.crime || 0, color: "#7c3aed" },
-  ];
+  useEffect(() => {
+    const refresh = setInterval(() => {
+      window.location.reload();
+    }, 300000);
+
+    return () => clearInterval(refresh);
+  }, []);
+
+  const redIcon = new L.Icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  const blueIcon = new L.Icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  const greenIcon = new L.Icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  const orangeIcon = new L.Icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  const greyIcon = new L.Icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png",
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+  });
+
+  const getMarkerIcon = (type) => {
+    switch (type) {
+      case "Fire":
+        return redIcon;
+
+      case "Flood":
+        return blueIcon;
+
+      case "Medical":
+        return greenIcon;
+
+      case "Accident":
+        return orangeIcon;
+
+      case "Crime":
+        return greyIcon;
+
+      default:
+        return redIcon;
+    }
+  };
+
+  const getIncidentIcon = (type) => {
+    switch (type) {
+      case "Fire":
+        return <FaFire color="#ef4444" />;
+
+      case "Flood":
+        return <FaWater color="#0ea5e9" />;
+
+      case "Medical":
+        return <FaHeartbeat color="#16a34a" />;
+
+      case "Crime":
+        return <FaShieldAlt color="#6b7280" />;
+
+      case "Accident":
+        return <FaCarCrash color="#f59e0b" />;
+
+      default:
+        return <FaExclamationTriangle color="#ef4444" />;
+    }
+  };
 
   return (
     <div style={styles.container}>
+      {/* HEADER */}
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>ESTANCIA MDRRMO COMMAND CENTER</h1>
-          <div style={styles.subtitle}>Emergency Operations Center</div>
+          <h1 style={styles.title}>
+            ESTANCIA MDRRMO COMMAND CENTER
+          </h1>
+
+          <p style={styles.subtitle}>
+            Real-Time Emergency Monitoring System
+          </p>
         </div>
 
-        <div style={styles.live}>
+        <div style={styles.liveBadge}>
           <FaBell />
-          <span>LIVE</span>
-          <strong>{time.toLocaleTimeString("en-PH")}</strong>
+          LIVE
         </div>
       </div>
 
-      <div style={styles.kpiRow}>
-        {cards.map((c) => (
-          <div key={c.label} style={{ ...styles.card, borderTop: `4px solid ${c.color}` }}>
-            <div style={styles.cardValue}>{c.value}</div>
-            <div style={styles.cardLabel}>{c.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div style={styles.main}>
+      {/* MAIN */}
+      <div style={styles.layout}>
+        {/* MAP */}
         <div style={styles.mapPanel}>
-          <div style={styles.panelTitle}>LIVE INCIDENT MAP</div>
+          <div style={styles.panelTitle}>
+            📍 LIVE INCIDENT MAP
+          </div>
+
           <MapContainer
-            center={[11.4554, 123.1586]}
+            center={[11.455414215231249, 123.15862548238557]}
             zoom={13}
-            style={{ height: "100%", width: "100%" }}
+            attributionControl={false}
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
           >
-            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png" />
-            {liveIncidents.map((i) => {
-              if (!i.gps_location) return null;
-              const [lat, lng] = i.gps_location.split(",").map(Number);
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            {liveIncidents.map((incident) => {
+              if (!incident.gps_location) return null;
+
+              const [lat, lng] = incident.gps_location
+                .split(",")
+                .map(Number);
+
               return (
-                <Marker key={i.id} position={[lat, lng]}>
+                <Marker
+                  key={incident.id}
+                  position={[lat, lng]}
+                  icon={getMarkerIcon(incident.type)}
+                >
                   <Popup>
-                    <b>{i.type}</b>
+                    <strong>{incident.type}</strong>
                     <br />
-                    {i.location}
+                    {incident.location}
+                    <br />
+                    {incident.description}
                   </Popup>
                 </Marker>
               );
@@ -115,70 +233,280 @@ export default function EstanciaDashboard() {
           </MapContainer>
         </div>
 
-        <div style={styles.side}>
-          <div style={styles.feedPanel}>
-            <div style={styles.panelTitle}>LIVE INCIDENT FEED</div>
+        {/* FEED */}
+        <div style={styles.feedPanel}>
+          <div style={styles.counterSection}>
+            <div style={styles.counter}>
+              <div style={styles.counterValue}>
+                {stats.incidents || 0}
+              </div>
 
-            <div style={styles.feed}>
-              {liveIncidents.map((i) => (
-                <div key={i.id} style={styles.feedItem}>
-                  <div>{icon(i.type)}</div>
-                  <div>
-                    <div style={{ fontWeight: 700 }}>{i.type}</div>
-                    <div>{i.location}</div>
-                    <div style={{ color: "#94a3b8", fontSize: 12 }}>
-                      {i.description}
+              <div style={styles.counterLabel}>
+                TOTAL INCIDENTS
+              </div>
+            </div>
+
+            <div style={styles.counter}>
+              <div style={styles.counterValue}>
+                {liveIncidents.length}
+              </div>
+
+              <div style={styles.counterLabel}>
+                ACTIVE
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.feedHeader}>
+            🚨 LIVE INCIDENT FEED
+          </div>
+
+          <div style={styles.feed}>
+            {liveIncidents.length > 0 ? (
+              liveIncidents.map((incident) => (
+                <div
+                  key={incident.id}
+                  style={styles.feedItem}
+                >
+                  <div>{getIncidentIcon(incident.type)}</div>
+
+                  <div style={{ flex: 1 }}>
+                    <div style={styles.feedType}>
+                      {incident.type}
+                    </div>
+
+                    <div style={styles.feedLocation}>
+                      📍 {incident.location}
+                    </div>
+
+                    <div style={styles.feedDesc}>
+                      {incident.description}
+                    </div>
+
+                    <div style={styles.feedDesc2}>
+                      Reported by: {incident.reported_by}
+                    </div>
+                    <div style={styles.feedDesc}>
+                      Contact: {
+                        incident.contact_number?.replace(
+                          /(\d{4})(\d{3})(\d{4})/,
+                          "$1-$2-$3"
+                        )
+                      }
+                    </div>
+
+                    <div style={styles.feedTime}>
+                      {new Date(incident.incident_datetime).toLocaleString(
+                        "en-PH",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        }
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            ) : (
+              <div style={{ padding: 20 }}>
+                No Active Incidents
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      <div style={styles.chartPanel}>
-        <div style={styles.panelTitle}>INCIDENT TREND</div>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={incidentTrend}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line dataKey="total" stroke="#38bdf8" strokeWidth={3} />
-          </LineChart>
-        </ResponsiveContainer>
+        {/* TREND */}
+        <div style={styles.trendPanel}>
+          <div style={styles.panelTitle}>
+            📈 INCIDENT TREND
+          </div>
+
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+          >
+            <LineChart data={incidentTrend}>
+              <CartesianGrid strokeDasharray="3 3" />
+
+              <XAxis
+                  dataKey="date"
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-PH", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                />
+
+              <YAxis />
+
+              <Tooltip />
+
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#ef4444"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
 }
 
-function icon(type) {
-  switch (type) {
-    case "Fire": return <FaFire color="#ef4444" />;
-    case "Flood": return <FaWater color="#0ea5e9" />;
-    case "Medical": return <FaHeartbeat color="#22c55e" />;
-    case "Crime": return <FaShieldAlt color="#a855f7" />;
-    default: return <FaCarCrash color="#f59e0b" />;
-  }
-}
-
 const styles = {
-  container:{height:"100vh",background:"#020617",padding:12,color:"#fff"},
-  header:{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#0f172a",padding:20,borderRadius:16},
-  title:{margin:0},
-  subtitle:{color:"#94a3b8"},
-  live:{display:"flex",gap:10,alignItems:"center"},
-  kpiRow:{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:12,marginTop:12},
-  card:{background:"#0f172a",borderRadius:16,padding:20,textAlign:"center"},
-  cardValue:{fontSize:34,fontWeight:700},
-  cardLabel:{color:"#94a3b8"},
-  main:{display:"grid",gridTemplateColumns:"70% 30%",gap:12,height:"55%",marginTop:12},
-  mapPanel:{background:"#0f172a",borderRadius:16,overflow:"hidden"},
-  side:{display:"flex"},
-  feedPanel:{background:"#0f172a",borderRadius:16,width:"100%"},
-  panelTitle:{padding:14,borderBottom:"1px solid #1e293b",fontWeight:700},
-  feed:{padding:10,overflowY:"auto",height:"calc(100% - 50px)"},
-  feedItem:{display:"flex",gap:10,background:"#111827",padding:10,borderRadius:12,marginBottom:10},
-  chartPanel:{height:"25%",marginTop:12,background:"#0f172a",borderRadius:16}
+  container: {
+    height: "100vh",
+    background: "#f3f4f6",
+    padding: "10px",
+    overflow: "hidden",
+  },
+
+  header: {
+    height: "60px",
+    background: "#fff",
+    borderRadius: "12px",
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    padding: "15px 20px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  title: {
+    margin: 0,
+    fontSize: "24px",
+  },
+
+  subtitle: {
+    margin: 0,
+    color: "#6b7280",
+  },
+
+  liveBadge: {
+    background: "#dcfce7",
+    color: "#166534",
+    padding: "8px 15px",
+    borderRadius: "999px",
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    fontWeight: "bold",
+  },
+
+  layout: {
+    display: "grid",
+    gridTemplateColumns: "1fr 420px",
+    gridTemplateRows: "1fr 220px",
+    // gap: "10px",
+    height: "calc(100vh - 110px)",
+  },
+
+  mapPanel: {
+    background: "#fff",
+    // borderRadius: "12px",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  feedPanel: {
+    background: "#fff",
+    // borderRadius: "12px",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  trendPanel: {
+    gridColumn: "1 / -1",
+    background: "#fff",
+    borderRadius: "12px",
+    padding: "15px",
+  },
+
+  panelTitle: {
+    padding: "12px",
+    fontWeight: "700",
+    borderBottom: "1px solid #e5e7eb",
+  },
+
+  counterSection: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "10px",
+    padding: "10px",
+  },
+
+  counter: {
+    background: "#111827",
+    color: "#fff",
+    borderRadius: "12px",
+    padding: "15px",
+    textAlign: "center",
+  },
+
+  counterValue: {
+    fontSize: "34px",
+    fontWeight: "700",
+  },
+
+  counterLabel: {
+    fontSize: "12px",
+  },
+
+  feedHeader: {
+    padding: "12px",
+    fontWeight: "700",
+    borderTop: "1px solid #e5e7eb",
+    borderBottom: "1px solid #e5e7eb",
+  },
+
+  feed: {
+    flex: 1,
+    overflowY: "auto",
+    padding: "10px",
+  },
+
+  feedItem: {
+    display: "flex",
+    gap: "10px",
+    padding: "10px",
+    marginBottom: "10px",
+    borderRadius: "10px",
+    background: "#f9fafb",
+  },
+
+  feedType: {
+    fontWeight: "700",
+  },
+
+  feedLocation: {
+    fontSize: "12px",
+  },
+
+  feedDesc: {
+    fontSize: "11px",
+    color: "#6b7280",
+  },
+
+  feedDesc2: {
+    fontSize: "11px",
+    color: "#6b7280",
+    marginTop: "10px",
+  },
+
+  feedTime: {
+    fontSize: "11px",
+    color: "#9ca3af",
+    marginTop: "5px",
+  },
 };
