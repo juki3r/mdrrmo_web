@@ -282,6 +282,10 @@ export default function EstanciaDashboard() {
                       {incident.description}
                     </div>
 
+                    <div style={styles.feedDesc}>
+                      {incident.reported_by} {incident.contact_number}
+                    </div>
+
                     <div style={styles.feedTime}>
                       {new Date(incident.incident_datetime).toLocaleString(
                         "en-PH",
