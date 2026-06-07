@@ -283,7 +283,7 @@ export default function EstanciaDashboard() {
                     </div>
 
                     <div style={styles.feedDesc}>
-                      {incident.reported_by} {incident.contact_number}
+                      Reported by: {incident.reported_by} | Contact: {incident.contact_number}
                     </div>
 
                     <div style={styles.feedTime}>
