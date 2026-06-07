@@ -239,6 +239,13 @@ export default function News() {
                       <span className="badge bg-light text-dark border">
                         {item.category}
                       </span>
+                      <span
+                          className={`badge ${
+                            item.barangay ? "bg-primary" : "bg-success"
+                          }`}
+                        >
+                          {item.barangay || "Municipality-wide"}
+                        </span>
 
                       <small className="text-muted">
                         {new Date(item.created_at).toLocaleString([], {

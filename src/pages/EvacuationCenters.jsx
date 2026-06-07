@@ -18,6 +18,39 @@ export default function EvacuationCenters() {
 
   const [facilityInput, setFacilityInput] = useState("");
 
+  const getPages = () => {
+  const delta = 2;
+  const range = [];
+  const rangeWithDots = [];
+
+  let last;
+
+  for (let i = 1; i <= lastPage; i++) {
+    if (
+      i === 1 ||
+      i === lastPage ||
+      (i >= page - delta && i <= page + delta)
+    ) {
+      range.push(i);
+    }
+  }
+
+  for (let i of range) {
+    if (last) {
+      if (i - last === 2) {
+        rangeWithDots.push(last + 1);
+      } else if (i - last !== 1) {
+        rangeWithDots.push("...");
+      }
+    }
+
+    rangeWithDots.push(i);
+    last = i;
+  }
+
+  return rangeWithDots;
+};
+
 
   const [form, setForm] = useState({
     id: null,
@@ -71,10 +104,11 @@ export default function EvacuationCenters() {
       );
 
       const data = await res.json();
-      console.log("EVAC DATA:", data);
+
       setCenters(data.data || []);
-      setPage(1);
-      setLastPage(1);
+
+      setPage(data.current_page || 1);
+      setLastPage(data.last_page || 1);
     } catch {
       toast.error("Failed to load evacuation centers");
     } finally {
@@ -83,8 +117,20 @@ export default function EvacuationCenters() {
   };
 
   useEffect(() => {
-    fetchCenters();
+    fetchCenters(1, "");
   }, []);
+  
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+
+      fetchCenters(1, search);
+
+    }, 500);
+
+    return () => clearTimeout(timer);
+
+  }, [search]);
 
  const normalizePayload = (data) => ({
     ...data,
@@ -552,58 +598,184 @@ export default function EvacuationCenters() {
 
         </div>
 
-        <div className="row g-3 mb-4">
+       <div className="row g-3 mb-4">
 
-          <div className="col-md-4">
-            <div className="card border-0 shadow-sm">
-              <div className="card-body">
-                <small className="text-muted">
-                  Total Barangays
-                </small>
-                <h2>{centers.length}</h2>
+          <div className="col-md-3">
+            <div className="card border-0 bg-primary text-white shadow-sm rounded-4">
+              <div className="card-body d-flex justify-content-between align-items-center">
+
+                <div>
+                  <small className="opacity-75">
+                    Total Barangays
+                  </small>
+
+                  <h4 className="fw-bold mb-0">
+                    {centers.length.toLocaleString()}
+                  </h4>
+                </div>
+
+                <i
+                  className="bi bi-building-fill"
+                  style={{
+                    fontSize: "2.5rem",
+                    opacity: 0.7
+                  }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="col-md-4">
-            <div className="card border-0 shadow-sm">
-              <div className="card-body">
-                <small className="text-muted">
-                  Total Occupants
-                </small>
-                <h2>
-                  {centers.reduce(
-                    (sum, x) => sum + Number(x.occupants || 0),
-                    0
-                  )}
-                </h2>
+          <div className="col-md-3">
+            <div className="card border-0 bg-success text-white shadow-sm rounded-4">
+              <div className="card-body d-flex justify-content-between align-items-center">
+
+                <div>
+                  <small className="opacity-75">
+                    Total Centers
+                  </small>
+
+                  <h4 className="fw-bold mb-0">
+                    {centers
+                      .reduce((sum, x) => sum + Number(x.centers || 0), 0)
+                      .toLocaleString()}
+                  </h4>
+                </div>
+
+                <i
+                  className="bi bi-house-heart-fill"
+                  style={{
+                    fontSize: "2.5rem",
+                    opacity: 0.7
+                  }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="col-md-4">
-            <div className="card border-0 shadow-sm">
-              <div className="card-body">
-                <small className="text-muted">
-                  Total Capacity
-                </small>
-                <h2>
-                  {centers.reduce(
-                    (sum, x) => sum + Number(x.capacity || 0),
-                    0
-                  )}
-                </h2>
+          <div className="col-md-3">
+            <div className="card border-0 bg-warning text-dark shadow-sm rounded-4">
+              <div className="card-body d-flex justify-content-between align-items-center">
+
+                <div>
+                  <small className="opacity-75">
+                    Total Occupants
+                  </small>
+
+                  <h4 className="fw-bold mb-0">
+                    {centers
+                      .reduce((sum, x) => sum + Number(x.occupants || 0), 0)
+                      .toLocaleString()}
+                  </h4>
+                </div>
+
+                <i
+                  className="bi bi-people-fill"
+                  style={{
+                    fontSize: "2.5rem",
+                    opacity: 0.7
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card border-0 bg-danger text-white shadow-sm rounded-4">
+              <div className="card-body d-flex justify-content-between align-items-center">
+
+                <div>
+                  <small className="opacity-75">
+                    Total Capacity
+                  </small>
+
+                  <h4 className="fw-bold mb-0">
+                    {centers
+                      .reduce((sum, x) => sum + Number(x.capacity || 0), 0)
+                      .toLocaleString()}
+                  </h4>
+                </div>
+
+                <i
+                  className="bi bi-person-fill-check"
+                  style={{
+                    fontSize: "2.5rem",
+                    opacity: 0.7
+                  }}
+                />
               </div>
             </div>
           </div>
 
         </div>
 
-        <div className="card border-0 shadow-sm">
+        <div className="card border-0 shadow-sm rounded-4 mb-3">
+          <div className="card-body">
+
+            <div className="d-flex justify-content-between align-items-center">
+
+              <div style={{ width: "350px" }}>
+
+                  <div className="position-relative">
+
+                    <i
+                      className="bi bi-search position-absolute"
+                      style={{
+                        left: 14,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#6c757d",
+                        zIndex: 1,
+                      }}
+                    />
+
+                    <input
+                      type="text"
+                      className="form-control ps-5 pe-5 rounded-pill"
+                      placeholder="Search barangay..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+
+                    {search && (
+                      <button
+                        type="button"
+                        className="btn position-absolute border-0 p-0"
+                        style={{
+                          right: 14,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#6c757d",
+                          zIndex: 2,
+                        }}
+                        onClick={() => {
+                          setSearch("");
+                          fetchCenters(1, "");
+                        }}
+                      >
+                        <i className="bi bi-x-circle-fill"></i>
+                      </button>
+                    )}
+
+                  </div>
+
+                </div>
+
+              <div>
+                <span className="">
+                  Total Barangay: {centers.length}
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <div className="card border-0 shadow-sm rounded-4">
 
           <div className="table-responsive">
 
-            <table className="table table-hover align-middle mb-0">
+            <table className="table align-middle mb-0">
 
               <thead className="table-light">
 
@@ -612,8 +784,8 @@ export default function EvacuationCenters() {
                   <th>Centers</th>
                   <th>Occupants</th>
                   <th>Capacity</th>
-                  <th>Utilization</th>
-                  <th></th>
+                  <th width="250">Utilization</th>
+                  <th width="140">Action</th>
                 </tr>
 
               </thead>
@@ -630,31 +802,41 @@ export default function EvacuationCenters() {
                       : 0;
 
                   return (
+
                     <tr key={c.barangay}>
 
-                      <td className="fw-semibold">
-                        {c.barangay}
+                      <td>
+                        <div>
+                          <div className="fw-semibold">
+                            {c.barangay}
+                          </div>
+
+                          <small className="text-muted">
+                            Evacuation Monitoring
+                          </small>
+                        </div>
                       </td>
 
                       <td>
-                        {c.centers}
+                        <span className="badge bg-primary">
+                          {c.centers}
+                        </span>
                       </td>
+
+                      <td>{c.occupants}</td>
+
+                      <td>{c.capacity}</td>
 
                       <td>
-                        {c.occupants}
-                      </td>
-
-                      <td>
-                        {c.capacity}
-                      </td>
-
-                      <td style={{width: 250}}>
 
                         <div className="d-flex align-items-center gap-2">
 
                           <div
                             className="progress flex-grow-1"
-                            style={{height: 8}}
+                            style={{
+                              height: 10,
+                              borderRadius: 20
+                            }}
                           >
                             <div
                               className={`progress-bar ${
@@ -679,18 +861,20 @@ export default function EvacuationCenters() {
                       </td>
 
                       <td>
-                        <div className="d-flex justify-content-center gap-2">
-                          <button
-                            className="btn btn-sm btn-outline-primary"
-                            onClick={() => viewCenters(c.barangay)}
-                          >
-                            View Centers
-                          </button>
-                        </div>
+
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() =>
+                            viewCenters(c.barangay)
+                          }
+                        >
+                          View Centers
+                        </button>
 
                       </td>
 
                     </tr>
+
                   );
 
                 })}
@@ -698,6 +882,60 @@ export default function EvacuationCenters() {
               </tbody>
 
             </table>
+
+            {lastPage > 1 && (
+              <div className="d-flex justify-content-between align-items-center mt-4 p-2">
+
+                <div className="text-muted small">
+                  Page {page} of {lastPage}
+                </div>
+
+                <nav>
+                  <ul className="pagination pagination-sm mb-0">
+
+                    <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => fetchCenters(page - 1, search)}
+                      >
+                        Prev
+                      </button>
+                    </li>
+
+                    {getPages().map((p, i) =>
+                      p === "..." ? (
+                        <li key={i} className="page-item disabled">
+                          <span className="page-link">...</span>
+                        </li>
+                      ) : (
+                        <li
+                          key={i}
+                          className={`page-item ${p === page ? "active" : ""}`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => fetchCenters(p, search)}
+                          >
+                            {p}
+                          </button>
+                        </li>
+                      )
+                    )}
+
+                    <li className={`page-item ${page === lastPage ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => fetchCenters(page + 1, search)}
+                      >
+                        Next
+                      </button>
+                    </li>
+
+                  </ul>
+                </nav>
+
+              </div>
+            )}
 
           </div>
 
@@ -813,6 +1051,7 @@ export default function EvacuationCenters() {
                                 {" "}Pax /
                                 {" "}
                                 {c.capacity || 0}
+                                {" "}Capacity
                               </small>
 
                             </div>

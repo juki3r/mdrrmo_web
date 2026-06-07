@@ -119,40 +119,80 @@ export default function Dashboard() {
 
   // ================= CARDS =================
   const cards = [
-    { label: "Residents", value: formatNumber(stats.residents), icon: <FaUsers /> },
-    { label: "Voters", value: formatNumber(stats.voters), icon: <FaIdCard /> },
-    { label: "Male", value: formatNumber(stats.male), icon: <FaMale /> },
-    { label: "Female", value: formatNumber(stats.female), icon: <FaFemale /> },
+    {
+      label: "Residents",
+      value: formatNumber(stats.residents),
+      icon: <FaUsers />,
+      bg: "#DBEAFE",
+      color: "#2563EB",
+    },
+    {
+      label: "Voters",
+      value: formatNumber(stats.voters),
+      icon: <FaIdCard />,
+      bg: "#DCFCE7",
+      color: "#16A34A",
+    },
+    {
+      label: "Male",
+      value: formatNumber(stats.male),
+      icon: <FaMale />,
+      bg: "#FEF3C7",
+      color: "#D97706",
+    },
+    {
+      label: "Female",
+      value: formatNumber(stats.female),
+      icon: <FaFemale />,
+      bg: "#FCE7F3",
+      color: "#DB2777",
+    },
     {
       label: "Blotters",
       value: formatNumber(stats.blotters),
       icon: <FaFileAlt />,
+      bg: "#FEE2E2",
+      color: "#DC2626",
       hideFor: ["mdrrmo_admin"],
     },
     {
       label: "Concerns",
       value: formatNumber(stats.concerns),
-      icon: <FaFileAlt />,
+      icon: <FaClipboardList />,
+      bg: "#E0F2FE",
+      color: "#0284C7",
       hideFor: ["mdrrmo_admin"],
     },
-
     {
       label: "Certificates",
       value: formatNumber(stats.certificates),
       icon: <FaFileAlt />,
+      bg: "#ECFCCB",
+      color: "#65A30D",
       hideFor: ["mdrrmo_admin"],
     },
-
     {
       label: "Ordinances",
       value: formatNumber(stats.ordinances),
-      icon: <FaFileAlt />,
+      icon: <FaBalanceScale />,
+      bg: "#EDE9FE",
+      color: "#7C3AED",
       hideFor: ["mdrrmo_admin"],
     },
-    
-  
-    { label: "App Users", value: formatNumber(stats.app_users), icon: <FaMobileAlt /> },
-    { label: "Incidents", value: formatNumber(stats.incidents), icon: <FaExclamationTriangle /> },
+    {
+      label: "App Users",
+      value: formatNumber(stats.app_users),
+      icon: <FaMobileAlt />,
+      bg: "#CCFBF1",
+      color: "#0F766E",
+    },
+    {
+      label: "Incidents",
+      value: formatNumber(stats.incidents),
+      icon: <FaExclamationTriangle />,
+      bg: "#FEE2E2",
+      color: "#DC2626",
+    },
   ];
 
   const redIcon = new L.Icon({
@@ -238,8 +278,21 @@ export default function Dashboard() {
       <div style={styles.grid}>
         {cards.filter(card => !card.hideFor?.includes(role))
           .map((c, i) => (
-            <div key={i} style={styles.card}>
-              <div style={styles.icon}>{c.icon}</div>
+            <div
+                key={i}
+                style={{
+                  ...styles.card,
+                  background: c.bg,
+                }}
+              >
+              <div
+                style={{
+                  ...styles.icon,
+                  color: c.color,
+                }}
+              >
+                {c.icon}
+              </div>
               <div>
                 <div style={styles.label}>{c.label}</div>
                 <div style={styles.value}>{c.value || 0}</div>

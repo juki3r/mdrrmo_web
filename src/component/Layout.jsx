@@ -119,7 +119,7 @@ export default function Layout() {
               {/* {role === "bdrrmo_admin" ? "BICDP" : "MICDP"} */}
               Resilient Community
             </div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-gray-400 text-uppercase" style={{fontSize:8 }}>
               {role === "bdrrmo_admin"
                 ? `${user?.barangay}, ${user?.municipality}`
                 : `${user?.municipality}, ${user?.province}`}
