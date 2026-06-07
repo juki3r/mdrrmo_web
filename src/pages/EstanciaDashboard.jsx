@@ -282,7 +282,7 @@ export default function EstanciaDashboard() {
                       {incident.description}
                     </div>
 
-                    <div style={styles.feedDesc}>
+                    <div style={styles.reproter}>
                       Reported by: {incident.reported_by} | Contact: {incident.contact_number}
                     </div>
 
@@ -477,6 +477,12 @@ const styles = {
   feedDesc: {
     fontSize: "11px",
     color: "#6b7280",
+  },
+
+  reporter: {
+    fontSize: "11px",
+    color: "#6b7280",
+    mtarginTop: "5px",
   },
 
   feedTime: {
