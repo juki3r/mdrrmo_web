@@ -364,7 +364,7 @@ const styles = {
     height: "80px",
     background: "#fff",
     borderRadius: "12px",
-    padding: "15px 20px",
+    padding: "15px 15px",
     marginBottom: "2px",
     display: "flex",
     justifyContent: "space-between",
