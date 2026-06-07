@@ -428,7 +428,7 @@ export default function Dashboard() {
 
             <div style={{ height: 500, borderRadius: 12, overflow: "hidden" }}>
               <MapContainer
-                center={[11.52650713035669, 123.23823962066035]}
+                center={[11.455414215231249, 123.15862548238557]}
                 zoom={13}
                 attributionControl={false}
                 style={{ height: "100%", width: "100%" }}
