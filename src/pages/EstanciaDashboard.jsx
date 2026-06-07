@@ -283,8 +283,7 @@ export default function EstanciaDashboard() {
                     </div>
 
                     <div style={styles.feedDesc2}>
-                      Reported by: {incident.reported_by}
-                       | Contact: {
+                      Reported by: {incident.reported_by} | Contact: {
                         incident.contact_number?.replace(
                           /(\d{4})(\d{3})(\d{4})/,
                           "$1-$2-$3"
