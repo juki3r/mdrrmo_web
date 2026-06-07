@@ -420,7 +420,7 @@ const styles = {
 
   feedPanel: {
     background: "#fff",
-    borderRadius: "12px",
+    // borderRadius: "12px",
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
