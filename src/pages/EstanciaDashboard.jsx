@@ -282,7 +282,7 @@ export default function EstanciaDashboard() {
                       {incident.description}
                     </div>
 
-                    <div style={styles.reproter}>
+                    <div style={styles.reporter}>
                       Reported by: {incident.reported_by} | Contact: {incident.contact_number}
                     </div>
 
