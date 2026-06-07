@@ -9,7 +9,7 @@ import AccessDenied from "../pages/AccessDenied";
 import ProtectedRoute from "../component/ProtectedRoute";
 import Layout from "../component/Layout";
 import Dashboard from "../pages/Dashboard";
-import EstanciaDashboard from "../pages/EstanciaDashboards";
+import EstanciaDashboard from "../pages/EstanciaDashboard";
 import Residents from "../pages/Residents";
 import Certificates from "../pages/Certificates";
 import Blotter from "@/pages/Blotter";
