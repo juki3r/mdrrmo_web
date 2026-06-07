@@ -69,7 +69,7 @@ export default function EstanciaDashboard() {
   useEffect(() => {
     fetchDashboard();
 
-    const interval = setInterval(fetchDashboard, 10000);
+    const interval = setInterval(fetchDashboard, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -482,7 +482,7 @@ const styles = {
   reporter: {
     fontSize: "11px",
     color: "#6b7280",
-    mtarginTop: "5px",
+    mtarginTop: "15px",
   },
 
   feedTime: {
