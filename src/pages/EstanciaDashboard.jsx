@@ -365,7 +365,6 @@ const styles = {
     background: "#fff",
     borderRadius: "12px",
     padding: "15px 20px",
-    marginBottom: "10px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
