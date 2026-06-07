@@ -74,6 +74,14 @@ export default function EstanciaDashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const refresh = setInterval(() => {
+      window.location.reload();
+    }, 300000);
+
+    return () => clearInterval(refresh);
+  }, []);
+
   const redIcon = new L.Icon({
     iconUrl:
       "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
