@@ -406,7 +406,7 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "1fr 420px",
     gridTemplateRows: "1fr 220px",
-    gap: "10px",
+    // gap: "10px",
     height: "calc(100vh - 110px)",
   },
 
