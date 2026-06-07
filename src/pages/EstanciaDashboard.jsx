@@ -377,6 +377,7 @@ const styles = {
     // borderBottomRightRadius: 0,
     padding: "15px 20px",
     display: "flex",
+    marginBottom: "2px",
     justifyContent: "space-between",
     alignItems: "center",
   },
