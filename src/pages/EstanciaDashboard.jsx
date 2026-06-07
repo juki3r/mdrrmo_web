@@ -188,7 +188,7 @@ export default function EstanciaDashboard() {
 
           <MapContainer
             center={[11.455414215231249, 123.15862548238557]}
-            zoom={11}
+            zoom={12}
             style={{
               width: "100%",
               height: "100%",
