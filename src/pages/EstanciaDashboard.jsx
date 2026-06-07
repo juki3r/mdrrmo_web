@@ -283,8 +283,8 @@ export default function EstanciaDashboard() {
                     </div>
 
                     <div style={styles.reporter}>
-                      Reported by: {incident.reported_by} 
-                      | Contact: {
+                      Reported by: {incident.reported_by}
+                       | Contact: {
                         incident.contact_number?.replace(
                           /(\d{4})(\d{3})(\d{4})/,
                           "$1-$2-$3"
@@ -488,7 +488,7 @@ const styles = {
   reporter: {
     fontSize: "11px",
     color: "#6b7280",
-    marginTop: "10px",
+    marginTop: "10px !important",
   },
 
   feedTime: {
