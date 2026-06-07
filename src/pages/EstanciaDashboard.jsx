@@ -373,8 +373,8 @@ const styles = {
     height: "60px",
     background: "#fff",
     borderRadius: "12px",
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    // borderBottomLeftRadius: 0,
+    // borderBottomRightRadius: 0,
     padding: "15px 20px",
     display: "flex",
     justifyContent: "space-between",
@@ -406,13 +406,13 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "1fr 420px",
     gridTemplateRows: "1fr 220px",
-    // gap: "10px",
+    gap: "10px",
     height: "calc(100vh - 110px)",
   },
 
   mapPanel: {
     background: "#fff",
-    // borderRadius: "12px",
+    borderRadius: "12px",
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
@@ -420,7 +420,7 @@ const styles = {
 
   feedPanel: {
     background: "#fff",
-    // borderRadius: "12px",
+    borderRadius: "12px",
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
