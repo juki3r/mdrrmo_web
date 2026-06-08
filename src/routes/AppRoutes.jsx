@@ -10,6 +10,7 @@ import ProtectedRoute from "../component/ProtectedRoute";
 import Layout from "../component/Layout";
 import Dashboard from "../pages/Dashboard";
 import EstanciaDashboard from "../pages/EstanciaDashboard";
+import CarlesDashboard from "../pages/CarlesDashboard";
 import Residents from "../pages/Residents";
 import Certificates from "../pages/Certificates";
 import Blotter from "@/pages/Blotter";
@@ -34,6 +35,7 @@ export default function AppRoutes() {
       <Route path="/otp" element={<OTP />} />
       <Route path="/accessdenied" element={<AccessDenied />} />
       <Route path="/estancia/dashboard" element={<EstanciaDashboard />} />
+      <Route path="/carles/dashboard" element={<CarlesDashboard />} />
 
       {/* PROTECTED (ALL LOGGED IN USERS) */}
       <Route element={<ProtectedRoute />}>
