@@ -196,7 +196,7 @@ export default function CarlesDashboard() {
 
           <MapContainer
             center={[11.556524368259023, 123.18929208985384]}
-            zoom={13}
+            zoom={11}
             attributionControl={false}
             style={{
               width: "100%",
